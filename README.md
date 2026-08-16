@@ -31,6 +31,82 @@ O sistema é composto por:
 </p>
 
 ---
+# REQUISITOS DO PROJETO
+
+## Requisitos funcionais
+
+**RF01**: O sistema deve permitir a interação do usuário por meio do aplicativo WhatsApp, utilizando
+um chatbot como interface principal.
+
+**RF02**: O chatbot deve apresentar opções de resposta ao usuário com base em uma tabela de
+decisões fornecida pelo PROCON, conduzindo a conversa de forma guiada.
+
+**RF03**: O sistema deve permitir a navegação por fluxos decisórios, apresentando perguntas e
+alternativas de forma sequencial e compreensível.
+
+**RF04**: Ao final do fluxo, o sistema deve gerar uma resposta orientadora, resumindo o caso do
+usuário e indicando os próximos passos recomendados.
+
+**RF05**: A resposta final poderá ser complementada por um modelo de linguagem (LLM),
+exclusivamente para a geração textual explicativa, respeitando as informações, limites e fluxos
+definidos pelo PROCON.
+
+**RF06**: O sistema deve registrar as interações realizadas, permitindo a análise posterior dos fluxos
+mais utilizados.
+
+**RF07**: Quando a resposta não solucionar a dúvida do cidadão, o chatbot deverá realizar um
+agendamento para atendimento presencial.
+
+**RF08**: Além do chatbot, deverá haver uma interface web para gerenciamento dos atendimentos
+agendados.
+
+## Requisitos não funcionais
+
+**RNF01**: A usabilidade será um requisito crítico, exigindo linguagem clara, objetiva e acessível ao
+público em geral.
+
+**RNF02**: O sistema deve apresentar alta disponibilidade e tempo de resposta adequado para
+conversas em tempo real.
+
+**RNF03**: A solução deve respeitar a Lei Geral de Proteção de Dados (LGPD), garantindo o tratamento
+adequado das informações dos usuários.
+
+**RNF04**: O chatbot deve deixar explícito que as respostas possuem caráter orientativo, não
+substituindo o atendimento jurídico ou administrativo formal.
+
+**RNF05**: O chatbot deve identificar de forma clara e transparente quais respostas são geradas com
+o auxílio de modelos de linguagem (LLM).
+
+**RNF06**: O sistema deve rodar em Docker.
+
+**RNF07**: Deverá haver documentações explicativas sobre como instalar a aplicação, assim como uma
+especificação de necessidades de hardware e software.
+
+**RNF08**: O projeto deverá adotar práticas modernas de desenvolvimento de software, incluindo
+metodologias ágeis, integração e entrega contínua (CI/CD), versionamento de código, testes de
+software e documentação técnica mínima.
+
+## Restrições do projeto
+
+**RP01**: A integração com o WhatsApp deverá ser realizada preferencialmente por meio da
+WhatsApp Business Platform (Cloud API). Para fins acadêmicos e de desenvolvimento, poderão ser
+utilizadas alternativas gratuitas, ambientes de testes ou soluções simuladas que reproduzam o
+fluxo de comunicação do WhatsApp (envio e recebimento de mensagens, identificação do usuário
+e controle de sessões), desde que preservem o modelo conceitual da integração.
+
+**RP02**: O back-end deverá ser desenvolvido utilizando tecnologias compatíveis com aplicações web
+modernas (ex.: Node.js ou Python).
+
+**RP03**: O sistema deverá ser estruturado de forma modular, separando a lógica do chatbot, a gestão
+dos fluxos decisórios e a integração com modelos de linguagem.
+
+**RP04**: O escopo do projeto deverá ser compatível com o tempo disponível para desenvolvimento
+ao longo do semestre.
+
+**RP05**: Não deverão ser utilizadas APIs externas de LLM, mesmo que gratuitas, devido à restrição de
+custos e também para proteção das informações de acordo com a LGPD.
+
+---
 
 # PRODUCT BACKLOG
 
@@ -241,224 +317,363 @@ O sistema é composto por:
 - O sistema não apresenta uma orientação como se fosse aplicável ao caso.
 - Quando apropriado, o sistema apresenta uma orientação sobre o próximo caminho a seguir.
 
-US12 — Receber orientação consolidada
-Como: consumidor
-Quero: receber uma orientação consolidada ao final do fluxo
-Para: entender quais medidas posso tomar em relação ao meu problema.
+## US12 — Receber orientação consolidada
 
-Critérios de aceitação
-O sistema apresenta um resumo do problema identificado.
-Apresenta a orientação correspondente.
-Apresenta os próximos passos.
-A orientação é baseada no fluxo percorrido.
-O sistema informa quando o caso necessita de atendimento presencial.
+**Como**: consumidor
 
-US13 — Receber próximos passos
-Como: consumidor
-Quero: saber quais são os próximos passos recomendados
-Para: saber o que devo fazer depois de receber a orientação.
+**Quero**: receber uma orientação consolidada ao final do fluxo
 
-Critérios de aceitação
-O sistema apresenta uma sequência clara de próximos passos.
-Os passos estão relacionados ao fluxo percorrido.
-A orientação não apresenta ações incompatíveis com o fluxo.
-Quando necessário, o sistema orienta o usuário a procurar atendimento presencial.
+**Para**: entender quais medidas posso tomar em relação ao meu problema.
 
-US14 — Receber explicação textual
-Como: consumidor
-Quero: receber uma explicação clara sobre a orientação apresentada
-Para: compreender melhor o resultado do meu atendimento.
+### Critérios de aceitação
 
-Critérios de aceitação
-A explicação utiliza linguagem acessível.
-A explicação mantém o significado da orientação oficial.
-A explicação não cria novas recomendações fora do fluxo definido.
-A resposta não possui caráter jurídico vinculante.
-O usuário consegue compreender a relação entre seu problema e a orientação apresentada.
+- O sistema apresenta um resumo do problema identificado.
 
-US15 — Identificar utilização de IA
-Como: consumidor
-Quero: saber quando uma resposta recebeu auxílio de um modelo de linguagem
-Para: ter transparência sobre a forma como a resposta foi produzida.
+- Apresenta a orientação correspondente.
 
-Critérios de aceitação
-O sistema identifica quando a resposta recebeu auxílio de IA.
-A identificação é apresentada de maneira clara.
-A informação não é confundida com uma validação jurídica.
-A utilização da IA não altera os limites definidos pelo fluxo decisório.
+- Apresenta os próximos passos.
 
-US16 — Informar caráter orientativo
-Como: consumidor
-Quero: ser informado de que as respostas possuem caráter orientativo
-Para: compreender que o chatbot não substitui o atendimento formal do PROCON.
+- A orientação é baseada no fluxo percorrido.
 
-Critérios de aceitação
-O chatbot informa seu caráter orientativo.
-A informação é apresentada de maneira compreensível.
-O sistema não apresenta a resposta como decisão jurídica.
-O usuário é orientado a procurar atendimento formal quando necessário.
+- O sistema informa quando o caso necessita de atendimento presencial.
 
-US17 — Consultar documentos necessários
-Como: consumidor
-Quero: saber quais documentos devo apresentar
-Para: chegar ao atendimento presencial com a documentação adequada.
+## US13 — Receber próximos passos
 
-Critérios de aceitação
-O sistema identifica os documentos associados ao fluxo.
-Apresenta os documentos de maneira organizada.
-Informa que documentos adicionais podem ser solicitados.
-Permite continuar para o agendamento.
+**Como**: consumidor
+
+**Quero**: saber quais são os próximos passos recomendados
+
+**Para**: saber o que devo fazer depois de receber a orientação.
+
+### Critérios de aceitação
+
+- O sistema apresenta uma sequência clara de próximos passos.
+
+- Os passos estão relacionados ao fluxo percorrido.
+
+- A orientação não apresenta ações incompatíveis com o fluxo.
+
+- Quando necessário, o sistema orienta o usuário a procurar atendimento presencial.
+
+## US14 — Receber explicação textual
+**Como**: consumidor
+
+**Quero**: receber uma explicação clara sobre a orientação apresentada
+
+**Para**: compreender melhor o resultado do meu atendimento.
+
+### Critérios de aceitação
+
+- A explicação utiliza linguagem acessível.
+
+- A explicação mantém o significado da orientação oficial.
+
+- A explicação não cria novas recomendações fora do fluxo definido.
+
+- A resposta não possui caráter jurídico vinculante.
+
+- O usuário consegue compreender a relação entre seu problema e a orientação apresentada.
+
+## US15 — Identificar utilização de IA
+
+**Como**: consumidor
+
+**Quero**: saber quando uma resposta recebeu auxílio de um modelo de linguagem
+
+**Para**: ter transparência sobre a forma como a resposta foi produzida.
+
+### Critérios de aceitação
+
+- O sistema identifica quando a resposta recebeu auxílio de IA.
+
+- A identificação é apresentada de maneira clara.
+
+- A informação não é confundida com uma validação jurídica.
+
+- A utilização da IA não altera os limites definidos pelo fluxo decisório.
+
+## US16 — Informar caráter orientativo
+
+**Como**: consumidor
+
+**Quero**: ser informado de que as respostas possuem caráter orientativo
+
+**Para**: compreender que o chatbot não substitui o atendimento formal do PROCON.
+
+### Critérios de aceitação
+
+- O chatbot informa seu caráter orientativo.
+  
+- A informação é apresentada de maneira compreensível.
+  
+- O sistema não apresenta a resposta como decisão jurídica.
+  
+- O usuário é orientado a procurar atendimento formal quando necessário.
+
+## US17 — Consultar documentos necessários
+
+**Como**: consumidor
+
+**Quero**: saber quais documentos devo apresentar
+
+**Para**: chegar ao atendimento presencial com a documentação adequada.
+
+### Critérios de aceitação
+
+- O sistema identifica os documentos associados ao fluxo.
+  
+- Apresenta os documentos de maneira organizada.
+  
+- Informa que documentos adicionais podem ser solicitados.
+  
+- Permite continuar para o agendamento.
 
 
-US18 — Identificar necessidade de atendimento presencial
-Como: consumidor
-Quero: saber quando preciso comparecer ao PROCON
-Para: entender quando a orientação pelo chatbot não é suficiente.
+## US18 — Identificar necessidade de atendimento presencial
 
-Critérios de aceitação
-O fluxo pode indicar necessidade de atendimento presencial.
-O chatbot explica o motivo do encaminhamento quando possível.
-O sistema apresenta a opção de agendamento.
-O usuário recebe orientação sobre os documentos necessários.
-Agendamento
+**Como**: consumidor
 
-US19 — Solicitar atendimento presencial
-Como: consumidor
-Quero: solicitar atendimento presencial
-Para: resolver um problema que não foi solucionado pelo chatbot.
+**Quero**: saber quando preciso comparecer ao PROCON
 
-Critérios de aceitação
-O usuário consegue escolher a opção de atendimento presencial.
-O sistema identifica o motivo do encaminhamento.
-O sistema inicia o processo de agendamento.
-O usuário recebe as orientações necessárias para prosseguir.
+**Para**: entender quando a orientação pelo chatbot não é suficiente.
 
-US20 — Consultar horários disponíveis
-Como: consumidor
-Quero: visualizar os horários disponíveis
-Para: escolher uma data e horário para meu atendimento.
+### Critérios de aceitação
 
-Critérios de aceitação
-O sistema apresenta datas disponíveis.
-O sistema apresenta horários disponíveis.
-Horários já ocupados não podem ser selecionados.
-O sistema permite selecionar uma opção disponível.
+- O fluxo pode indicar necessidade de atendimento presencial.
+  
+- O chatbot explica o motivo do encaminhamento quando possível.
+  
+- O sistema apresenta a opção de agendamento.
+  
+- O usuário recebe orientação sobre os documentos necessários.
 
-US21 — Realizar agendamento
-Como: consumidor
-Quero: escolher uma data e horário para atendimento
-Para: agendar meu atendimento presencial no PROCON.
+## US19 — Solicitar atendimento presencial
 
-Critérios de aceitação
-O usuário consegue selecionar um horário disponível.
-O sistema registra o agendamento.
-O sistema associa o agendamento ao usuário.
-O sistema impede dois agendamentos para o mesmo horário quando não houver disponibilidade.
-O sistema apresenta confirmação do agendamento.
+**Como**: consumidor
 
-US22 — Confirmar agendamento
-Como: consumidor
-Quero: receber a confirmação do meu agendamento
-Para: ter certeza de que meu atendimento foi registrado.
+**Quero**: solicitar atendimento presencial
 
-Critérios de aceitação
-O sistema informa que o agendamento foi realizado.
-Apresenta data e horário.
-Apresenta as informações necessárias para o comparecimento.
-Apresenta os documentos necessários quando disponíveis.
-O usuário consegue identificar seu agendamento posteriormente.
+**Para**: resolver um problema que não foi solucionado pelo chatbot.
 
-US23 — Consultar agendamento
-Como: consumidor
-Quero: consultar as informações do meu agendamento
-Para: verificar data, horário e orientações antes do atendimento.
+### Critérios de aceitação
 
-Critérios de aceitação
-O usuário consegue consultar seu agendamento.
-O sistema apresenta data e horário.
-O sistema apresenta as orientações relacionadas ao atendimento.
-O sistema apresenta os documentos necessários quando aplicável.
+- O usuário consegue escolher a opção de atendimento presencial.
+  
+- O sistema identifica o motivo do encaminhamento.
+  
+- O sistema inicia o processo de agendamento.
+  
+- O usuário recebe as orientações necessárias para prosseguir.
 
-US24 — Visualizar atendimentos agendados
-Como: funcionário do PROCON
-Quero: visualizar os atendimentos agendados
-Para: organizar e acompanhar os atendimentos presenciais.
+## US20 — Consultar horários disponíveis
 
-Critérios de aceitação
-O funcionário consegue acessar a lista de atendimentos.
-Os atendimentos apresentam data e horário.
-É possível identificar o consumidor associado.
-Os atendimentos são organizados de maneira compreensível.
-O funcionário consegue consultar os detalhes de um atendimento.
+**Como**: consumidor
 
-US25 — Consultar dados do atendimento
-Como: funcionário do PROCON
-Quero: consultar os dados relacionados ao atendimento
-Para: compreender previamente a situação apresentada pelo consumidor.
+**Quero**: visualizar os horários disponíveis
 
-Critérios de aceitação
-O funcionário consegue selecionar um atendimento.
-O sistema apresenta os dados necessários para o atendimento.
-O sistema apresenta o motivo do encaminhamento.
-O sistema apresenta as informações permitidas sobre o fluxo percorrido.
-Dados não autorizados não são apresentados.
+**Para**: escolher uma data e horário para meu atendimento.
 
-US26 — Gerenciar disponibilidade
-Como: funcionário do PROCON
-Quero: gerenciar os horários disponíveis para atendimento
-Para: disponibilizar horários adequados aos consumidores.
+### Critérios de aceitação
 
-Critérios de aceitação
-O funcionário consegue cadastrar disponibilidade.
-O funcionário consegue bloquear horários.
-Horários indisponíveis não aparecem para o consumidor.
-O sistema evita conflito de horários.
-Alterações de disponibilidade refletem nos novos agendamentos.
+- O sistema apresenta datas disponíveis.
 
-US27 — Acompanhar situação do agendamento
-Como: funcionário do PROCON
-Quero: visualizar a situação dos atendimentos agendados
-Para: acompanhar os atendimentos previstos.
+- O sistema apresenta horários disponíveis.
 
-Critérios de aceitação
-O sistema apresenta os agendamentos.
-Cada agendamento possui uma situação.
-O funcionário consegue identificar atendimentos futuros.
-O funcionário consegue atualizar a situação quando permitido.
+- Horários já ocupados não podem ser selecionados.
 
-US28 — Registrar interação
-Como: sistema
-Quero: registrar as interações realizadas durante o atendimento
-Para: manter informações necessárias para análise posterior dos fluxos utilizados.
+- O sistema permite selecionar uma opção disponível.
 
-Critérios de aceitação
-As interações são registradas.
-As interações são associadas à sessão correspondente.
-O registro identifica o fluxo utilizado.
-O sistema registra as etapas necessárias para análise.
-O armazenamento respeita as regras de proteção de dados.
+## US21 — Realizar agendamento
 
-US29 — Identificar fluxos mais utilizados
-Como: PROCON
-Quero: identificar quais fluxos são mais utilizados pelos consumidores
-Para: compreender quais tipos de dúvidas possuem maior demanda.
+**Como**: consumidor
 
-Critérios de aceitação
-O sistema contabiliza os fluxos utilizados.
-É possível identificar os fluxos mais acessados.
-Os dados podem ser consultados pela equipe autorizada.
-As informações são apresentadas de forma compreensível.
+**Quero**: escolher uma data e horário para atendimento
 
-US30 — Identificar encaminhamentos presenciais
-Como: PROCON
-Quero: identificar quais fluxos geram mais encaminhamentos presenciais
-Para: compreender quais situações não estão sendo solucionadas pelo atendimento automatizado.
+**Para**: agendar meu atendimento presencial no PROCON.
 
-Critérios de aceitação
-O sistema registra quando um fluxo termina em encaminhamento.
-O encaminhamento é associado ao fluxo correspondente.
-É possível contabilizar os encaminhamentos.
-Os dados podem ser utilizados para análise posterior.
+### Critérios de aceitação
+
+- O usuário consegue selecionar um horário disponível.
+
+- O sistema registra o agendamento.
+
+- O sistema associa o agendamento ao usuário.
+
+- O sistema impede dois agendamentos para o mesmo horário quando não houver disponibilidade.
+
+- O sistema apresenta confirmação do agendamento.
+
+## US22 — Confirmar agendamento
+
+**Como**: consumidor
+
+**Quero**: receber a confirmação do meu agendamento
+
+**Para**: ter certeza de que meu atendimento foi registrado.
+
+### Critérios de aceitação
+
+- O sistema informa que o agendamento foi realizado.
+
+- Apresenta data e horário.
+
+- Apresenta as informações necessárias para o comparecimento.
+
+- Apresenta os documentos necessários quando disponíveis.
+
+- O usuário consegue identificar seu agendamento posteriormente.
+
+## US23 — Consultar agendamento
+
+**Como**: consumidor
+
+**Quero**: consultar as informações do meu agendamento
+
+**Para**: verificar data, horário e orientações antes do atendimento.
+
+### Critérios de aceitação
+
+- O usuário consegue consultar seu agendamento.
+
+- O sistema apresenta data e horário.
+
+- O sistema apresenta as orientações relacionadas ao atendimento.
+
+- O sistema apresenta os documentos necessários quando aplicável.
+
+## US24 — Visualizar atendimentos agendados
+
+**Como**: funcionário do PROCON
+
+**Quero**: visualizar os atendimentos agendados
+
+**Para**: organizar e acompanhar os atendimentos presenciais.
+
+### Critérios de aceitação
+
+- O funcionário consegue acessar a lista de atendimentos.
+
+- Os atendimentos apresentam data e horário.
+
+- É possível identificar o consumidor associado.
+
+- Os atendimentos são organizados de maneira compreensível.
+
+- O funcionário consegue consultar os detalhes de um atendimento.
+
+## US25 — Consultar dados do atendimento
+
+**Como**: funcionário do PROCON
+
+**Quero**: consultar os dados relacionados ao atendimento
+
+**Para**: compreender previamente a situação apresentada pelo consumidor.
+
+### Critérios de aceitação
+
+- O funcionário consegue selecionar um atendimento.
+
+- O sistema apresenta os dados necessários para o atendimento.
+
+- O sistema apresenta o motivo do encaminhamento.
+
+- O sistema apresenta as informações permitidas sobre o fluxo percorrido.
+
+- Dados não autorizados não são apresentados.
+
+## US26 — Gerenciar disponibilidade
+
+**Como**: funcionário do PROCON
+
+**Quero**: gerenciar os horários disponíveis para atendimento
+
+**Para**: disponibilizar horários adequados aos consumidores.
+
+### Critérios de aceitação
+
+- O funcionário consegue cadastrar disponibilidade.
+  
+- O funcionário consegue bloquear horários.
+  
+- Horários indisponíveis não aparecem para o consumidor.
+  
+- O sistema evita conflito de horários.
+  
+- Alterações de disponibilidade refletem nos novos agendamentos.
+
+## US27 — Acompanhar situação do agendamento
+
+**Como**: funcionário do PROCON
+
+**Quero**: visualizar a situação dos atendimentos agendados
+
+**Para**: acompanhar os atendimentos previstos.
+
+### Critérios de aceitação
+
+- O sistema apresenta os agendamentos.
+  
+- Cada agendamento possui uma situação.
+  
+- O funcionário consegue identificar atendimentos futuros.
+  
+- O funcionário consegue atualizar a situação quando permitido.
+
+## US28 — Registrar interação
+
+**Como**: sistema
+
+**Quero**: registrar as interações realizadas durante o atendimento
+
+**Para**: manter informações necessárias para análise posterior dos fluxos utilizados.
+
+### Critérios de aceitação
+
+- As interações são registradas.
+
+- As interações são associadas à sessão correspondente.
+
+- O registro identifica o fluxo utilizado.
+
+- O sistema registra as etapas necessárias para análise.
+
+- O armazenamento respeita as regras de proteção de dados.
+
+## US29 — Identificar fluxos mais utilizados
+
+**Como**: PROCON
+
+**Quero**: identificar quais fluxos são mais utilizados pelos consumidores
+
+**Para**: compreender quais tipos de dúvidas possuem maior demanda.
+
+### Critérios de aceitação
+
+- O sistema contabiliza os fluxos utilizados.
+
+- É possível identificar os fluxos mais acessados.
+
+- Os dados podem ser consultados pela equipe autorizada.
+
+- As informações são apresentadas de forma compreensível.
+
+## US30 — Identificar encaminhamentos presenciais
+
+**Como**: PROCON
+
+**Quero**: identificar quais fluxos geram mais encaminhamentos presenciais
+
+**Para**: compreender quais situações não estão sendo solucionadas pelo atendimento automatizado.
+
+### Critérios de aceitação
+
+- O sistema registra quando um fluxo termina em encaminhamento.
+  
+- O encaminhamento é associado ao fluxo correspondente.
+  
+- É possível contabilizar os encaminhamentos.
+  
+- Os dados podem ser utilizados para análise posterior.
 
 ---
 
