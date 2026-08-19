@@ -675,7 +675,7 @@ custos e também para proteção das informações de acordo com a LGPD.
   
 - Os dados podem ser utilizados para análise posterior.
 
-## US08 — Aprender com os atendimentos
+## US31 — Aprender com os atendimentos
 
 **Como**: responsável pelo sistema
 
