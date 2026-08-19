@@ -675,6 +675,32 @@ custos e também para proteção das informações de acordo com a LGPD.
   
 - Os dados podem ser utilizados para análise posterior.
 
+## US08 — Aprender com os atendimentos
+
+**Como**: responsável pelo sistema
+
+**Quero**: que os atendimentos realizados sejam registrados e analisados para identificar novos casos e padrões
+
+**Para**: aprimorar a capacidade do chatbot de orientar consumidores em atendimentos futuros.
+
+### Critérios de aceitação
+
+- Os atendimentos podem ser registrados.
+
+- As perguntas e respostas do atendimento podem ser armazenadas.
+
+- O resultado do atendimento pode ser identificado.
+
+- Casos relevantes podem ser selecionados para análise.
+
+- Novos casos podem ser incorporados à base de conhecimento.
+
+- A atualização da base não deve ocorrer de maneira automática sem validação.
+
+- O histórico utilizado para aprendizado deve respeitar as regras de proteção de dados.
+
+- O sistema deve manter rastreabilidade das informações incorporadas à base.
+
 ---
 
 # DEFINITION OF DONE
