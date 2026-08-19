@@ -27,7 +27,7 @@ O sistema é composto por:
 
 ### Ferramentas
 <p>
-  <img src="https://skillicons.dev/icons?i=git,github,figma,vscode" />
+  <img src="https://skillicons.dev/icons?i=git,github,figma,vscode,docker" />
 </p>
 
 ---
