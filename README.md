@@ -31,6 +31,84 @@ O sistema é composto por:
 </p>
 
 ---
+# Executando o Projeto com Docker
+
+## Pré-requisitos
+
+Antes de executar o projeto, é necessário ter o **Docker Desktop** instalado e em execução.
+
+## 1. Construir a imagem Docker
+
+Na raiz do projeto, execute:
+
+```bash
+docker compose -f docker/docker-compose.yml build
+```
+
+Esse comando cria a imagem do frontend utilizando o Dockerfile localizado em:
+
+```text
+docker/frontend/Dockerfile
+```
+
+Durante a construção da imagem, as dependências do projeto são instaladas automaticamente por meio do comando `npm ci`.
+
+## 2. Iniciar o container
+
+Após a construção da imagem, execute:
+
+```bash
+docker compose -f docker/docker-compose.yml up
+```
+
+O Docker irá criar e iniciar o container do frontend.
+
+Quando o Vite estiver pronto, será exibida uma mensagem semelhante a:
+
+```text
+VITE ... ready
+
+Local: http://localhost:5173/
+```
+
+## 3. Acessar a aplicação
+
+Com o container em execução, abra o navegador e acesse:
+
+**http://localhost:5173**
+
+A aplicação estará sendo executada dentro do container Docker.
+
+## 4. Verificar o container
+
+Para verificar se o container está em execução, abra outro terminal e execute:
+
+```bash
+docker compose -f docker/docker-compose.yml ps
+```
+
+O serviço `frontend` deverá apresentar um status semelhante a:
+
+```text
+Up
+```
+
+A porta deverá estar configurada como:
+
+```text
+0.0.0.0:5173->5173/tcp
+```
+
+## 5. Encerrar o ambiente
+
+Para parar e remover o container e a rede criada pelo Docker Compose, execute:
+
+```bash
+docker compose -f docker/docker-compose.yml down
+```
+
+---
+
 # REQUISITOS DO PROJETO
 
 ## Requisitos funcionais
