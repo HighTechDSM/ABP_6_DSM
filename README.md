@@ -544,109 +544,101 @@ Uma User Story será considerada Entregue quando:
 
 ## Sprint 1 — Fundação do projeto
 
-| ID      | Requisito       | User Story | Tarefa                                                    | Prioridade |
-|---------|-----------------|------------|-----------------------------------------------------------|------------|
-| ABP-001 | RP02/RP03       | —	         | Definir arquitetura geral da aplicação	                   | Alta       |
-| ABP-002	| RP02            |	—	         | Definir tecnologia e estrutura do backend                 | Alta       |
-| ABP-003	| RP03            | —	         | Definir separação entre chatbot, fluxos e integração	     | Alta       |
-| ABP-004	| RNF06	          | —	         | Configurar ambiente Docker	                               | Alta       |
-| ABP-005	| RNF08	          | —	         | Configurar repositório e estratégia de versionamento	     | Alta       |
-| ABP-006	| RNF08	          | —	         | Definir padrão de branches e GitHub Flow	                 | Alta       |
-| ABP-007	| RNF08	          | —	         | Configurar estrutura inicial de CI	                       | Média      |
-| ABP-008	| RP03	          | —	         | Criar estrutura inicial do backend	                       | Alta       |
-| ABP-009	| —	              | —	         | Configurar variáveis de ambiente	                         | Alta       |
-| ABP-010	| —	              | —	         | Configurar banco de dados                                 | Alta       |
-| ABP-011	| —	              | —	         | Criar estrutura inicial do frontend                       | Alta       |
-| ABP-012	| RF01	          | US01	     | Definir layout da interface simulada do WhatsApp	         | Alta       |
-| ABP-013	| RF01	          | US01	     | Criar cabeçalho da interface de conversa	                 | Média      |
-| ABP-014	| RF01	          | US01	     | Criar componente de mensagens enviadas	                   | Alta       |
-| ABP-015	| RF01	          | US01	     | Criar componente de mensagens recebidas                   | Alta       |
-| ABP-016	| RF01	          | US01	     | Criar campo de entrada de mensagens                       | Alta       |
-| ABP-017	| RF01	          | US01	     | Criar botão de envio de mensagens                         | Alta       |
-| ABP-018	| RF01	          | US01	     | Implementar histórico visual da conversa	                 | Média      |
-| ABP-019	| RF01	          | US01	     | Implementar comunicação da interface com o backend	       | Alta       |
-| ABP-020	| RP01	          | US03	     | Definir estratégia de integração com a API do WhatsApp	   | Alta       |
-| ABP-021	| RP01	          | US03	     | Configurar ambiente de testes da API do WhatsApp	         | Alta       |
-| ABP-022	| RP01	          | US03	     | Configurar recebimento de mensagens                       | Alta       |
-| ABP-023	| RP01	          | US03	     | Configurar envio de mensagens                             | Alta       |
-| ABP-024	| RP01	          | US03	     | Criar tratamento de mensagens recebidas                   | Alta       |
-| ABP-025	| RF01	          | US02	     | Criar modelo de usuário                                   | Alta       |
-| ABP-026	| RF01	          | US02	     | Criar modelo de sessão	                                   | Alta       |
-| ABP-027	| RF01	          | US02	     | Implementar criação de sessão                             | Alta       |
-| ABP-028	| RF01	          | US02	     | Implementar recuperação de sessão                         | Alta       |
-| ABP-029	| RF01	          | US02	     | Associar mensagens às sessões                             | Alta       |
-| ABP-030	| RF02	          | US03	     | Definir categorias iniciais de problemas	                 | Alta       |
-| ABP-031	| RF02	          | US03	     | Criar estrutura de categorias no banco	                   | Alta       |
-| ABP-032	| RF02	          | US03	     | Implementar consulta de categorias	                       | Alta       |
-| ABP-033	| RF02	          | US03	     | Implementar apresentação das categorias no chatbot	       | Alta       |
-| ABP-034	| RF02/RF03	      | US04	     | Definir estrutura dos fluxos decisórios                   | Alta       |
-| ABP-035	| RF02/RF03	      | US04	     | Criar modelo de perguntas                                 | Alta       |
-| ABP-036	| RF02/RF03	      | US04	     | Criar modelo de alternativas	                             | Alta       |
-| ABP-037	| RF03	          | US04	     | Implementar transição entre etapas do fluxo               | Alta       |
-| ABP-038	| RF03	          | US04	     | Implementar controle do estado do fluxo                   | Alta       |
-| ABP-039	| RF03	          | US05	     | Implementar perguntas condicionais	                       | Alta       |
-| ABP-040	| RF03	          | US05	     | Implementar seleção da próxima pergunta                   | Alta       |
-| ABP-041	| RF02	          | US07	     | Analisar documento de Dúvidas Frequentes	                 | Alta       |
-| ABP-042	| RF02	          | US07	     | Identificar categorias existentes no documento	           | Alta       |
-| ABP-043	| RF02	          | US07	     | Estruturar perguntas e respostas do documento             | Alta       |
-| ABP-044	| RF02	          | US07	     | Estruturar documentos necessários                         | Alta       |
-| ABP-045	| RF02/RF03	      | US07	     | Inserir conteúdo inicial na base de conhecimento	         | Alta       |
-| ABP-046	| RF02/RF03	      | US07	     | Validar conteúdo importado da base	                       | Alta       |
-| ABP-047	| RF01/RF02/RF03	| US01–US05	 | Integrar interface, backend e chatbot                     | Alta       |
-| ABP-048	| RNF01	          | US01–US05	 | Revisar linguagem das mensagens do chatbot	               | Alta       |
-| ABP-049	| RNF04	          | US01	     | Implementar aviso de caráter orientativo	                 | Alta       |
-| ABP-050	| RNF08	          | US01–US05	 | Criar testes do primeiro fluxo	                           | Alta       |
-| ABP-051	| RF12/RP09	      | US15–US17	 | Definir estratégia de aprendizado com os atendimentos     | Média      |
-| ABP-052	| RF12	          | US15	     | Definir estrutura de dados para registro dos atendimentos | Média      |
-| ABP-053	| RF12	          | US16	     | Definir critérios para seleção de casos relevantes        | Média      |
-| ABP-054	| RF12/RNF03	    | US17	     | Definir processo de validação de novos conhecimentos      | Média      |
+| ID      | Requisito | User Story | Tarefa                                                    | Prioridade |
+|---------|-----------|------------|-----------------------------------------------------------|------------|
+| ABP-001	| RP02/RP03	| —	         | Definir arquitetura geral da aplicação	                   | Alta       |
+| ABP-002	| RP02	    | —	         | Definir tecnologias do backend	                           | Alta       |
+| ABP-003	| RP03	    | —	         | Definir separação entre módulos do sistema	               | Alta       |
+| ABP-004	| RP03	    | —	         | Definir comunicação entre os módulos	                     | Alta       |
+| ABP-005	| RNF06	    | —	         | Configurar ambiente Docker	                               | Alta       |
+| ABP-006	| RNF08	    | —	         | Configurar repositório do projeto	                       | Alta       |
+| ABP-007	| RNF08	    | —	         | Definir estratégia de versionamento	                     | Alta       |
+| ABP-008	| RNF08	    | —	         | Definir padrão de branches e GitHub Flow	                 | Alta       |
+| ABP-009	| RNF08	    | —	         | Configurar integração contínua inicial	                   | Média      |
+| ABP-010	| RP02	    | —	         | Criar estrutura inicial do backend	                       | Alta       |
+| ABP-011	| RP02	    | —	         | Configurar variáveis de ambiente	                         | Alta       |
+| ABP-012	| RP02	    | —	         | Configurar conexão com banco de dados SQL	               | Alta       |
+| ABP-013	| RP01	    | US01	     | Definir estratégia de integração com a API do WhatsApp	   | Alta       |
+| ABP-014	| RP01	    | US01	     | Configurar ambiente de testes da API do WhatsApp	         | Alta       |
+| ABP-015	| RP01	    | US01	     | Implementar recebimento de mensagens	                     | Alta       |
+| ABP-016	| RP01	    | US01	     | Implementar envio de mensagens	                           | Alta       |
+| ABP-017	| RP01	    | US01	     | Implementar tratamento de mensagens recebidas	           | Alta       |
+| ABP-018	| RF01	    | US01	     | Criar mensagem inicial do chatbot	                       | Alta       |
+| ABP-019	| RNF04	    | US01	     | Implementar aviso de caráter orientativo	                 | Alta       |
+| ABP-020	| RF02	    | US02	     | Criar modelo de consumidor	                               | Alta       |
+| ABP-021	| RF02	    | US02	     | Criar modelo de sessão	                                   | Alta       |
+| ABP-022	| RF02	    | US02	     | Implementar criação de sessão	                           | Alta       |
+| ABP-023	| RF02	    | US02	     | Implementar recuperação de sessão	                       | Alta       |
+| ABP-024	| RF02	    | US02	     | Associar mensagens à sessão	                             | Alta       |
+| ABP-025	| RF03	    | US03	     | Definir categorias iniciais de problemas	                 | Alta       |
+| ABP-026	| RF03	    | US03	     | Criar estrutura de categorias	                           | Alta       |
+| ABP-027	| RF03	    | US03	     | Implementar consulta de categorias	                       | Alta       |
+| ABP-028	| RF03	    | US03	     | Implementar apresentação das categorias no WhatsApp	     | Alta       |
+| ABP-029	| RF04	    | US04	     | Definir estrutura dos fluxos decisórios	                 | Alta       |
+| ABP-030	| RF04	    | US04	     | Criar modelo de perguntas	                               | Alta       |
+| ABP-031	| RF04	    | US04	     | Criar modelo de alternativas	                             | Alta       |
+| ABP-032	| RF04	    | US04	     | Implementar transição entre etapas	                       | Alta       |
+| ABP-033	| RF04	    | US04	     | Implementar controle de estado do fluxo	                 | Alta       |
+| ABP-034	| RF04	    | US05	     | Implementar perguntas condicionais	                       | Alta       |
+| ABP-035	| RF04	    | US05	     | Implementar seleção da próxima pergunta	                 | Alta       |
+| ABP-036	| RF09/RP07	| US07	     | Analisar documento de Dúvidas Frequentes	                 | Alta       |
+| ABP-037	| RF09/RP07	| US07	     | Identificar categorias existentes na documentação	       | Alta       |
+| ABP-038	| RF09/RP07	| US07	     | Estruturar perguntas e respostas da documentação	         | Alta       |
+| ABP-039	| RF09/RP07	| US07	     | Estruturar informações sobre documentos necessários	     | Alta       |
+| ABP-040	| RF09	    | US07	     | Criar estrutura da base de conhecimento	                 | Alta       |
+| ABP-041	| RF09	    | US07	     | Inserir conteúdo inicial na base	                         | Alta       |
+| ABP-042	| RF09	    | US07	     | Validar conteúdo importado	                               | Alta       |
+| ABP-043	| RF01–RF04	| US01–US05	 | Integrar WhatsApp, chatbot e fluxos decisórios	           | Alta       |
+| ABP-044	| RNF01	    | US01–US07	 | Revisar linguagem das mensagens	                         | Alta       |
+| ABP-045	| RNF08	    | US01–US05	 | Criar testes do fluxo inicial	                           | Alta       |
+| ABP-046	| RNF08	    | US01–US05	 | Realizar teste integrado do atendimento inicial	         | Alta       |
 
 ---
 
 ## Sprint 2 — Orientação e atendimento presencial
 
-| ID      | Requisito         | User Story | Tarefa                                                             | Prioridade |
-|---------|-------------------|------------|--------------------------------------------------------------------|------------|
-| ABP-051	| RF04	            | US12	     | Definir estrutura da orientação final                              |	Alta       |
-| ABP-052	| RF04	            | US12	     | Criar modelo de orientação	                                        | Alta       |
-| ABP-053	| RF04	            | US12	     | Associar orientação aos fluxos	                                    | Alta       |
-| ABP-054	| RF04	            | US12	     | Implementar geração da orientação consolidada	                    | Alta       |
-| ABP-055	| RF04	            | US13	     | Criar estrutura dos próximos passos	                              | Alta       |
-| ABP-056	| RF04	            | US13	     | Associar próximos passos aos fluxos	                              | Alta       |
-| ABP-057	| RF04	            | US13	     | Implementar apresentação dos próximos passos	                      | Alta       |
-| ABP-058	| RF04	            | US11	     | Implementar identificação de casos fora do escopo	                | Alta       |
-| ABP-059	| RF04	            | US11	     | Criar mensagens para casos fora do escopo	                        | Alta       |
-| ABP-060	| RF07	            | US18	     | Implementar identificação de necessidade de atendimento presencial	| Alta       |
-| ABP-061	| RF07	            | US18	     | Criar fluxo de encaminhamento para agendamento	                    | Alta       |
-| ABP-062	| RF07	            | US17	     | Criar modelo de documentos necessários	                            | Alta       |
-| ABP-063	| RF07	            | US17	     | Associar documentos aos fluxos	                                    | Alta       |
-| ABP-064	| RF07	            | US17	     | Implementar apresentação dos documentos no chatbot	                | Alta       |
-| ABP-065	| RF07	            | US19	     | Criar página de agendamento	                                      | Alta       |
-| ABP-066	| RF07	            | US19	     | Criar formulário de atendimento	                                  | Alta       |
-| ABP-067	| RF07	            | US20	     | Criar modelo de disponibilidade	                                  | Alta       |
-| ABP-068	| RF07	            | US20	     | Criar cadastro de horários disponíveis  	                          | Alta       |
-| ABP-069	| RF07	            | US20	     | Implementar consulta de horários disponíveis	                      | Alta       |
-| ABP-070	| RF07	            | US20	     | Implementar seleção de data	                                      | Alta       |
-| ABP-071	| RF07	            | US20	     | Implementar seleção de horário	                                    | Alta       |
-| ABP-072	| RF07	            | US21	     | Criar modelo de agendamento	                                      | Alta       |
-| ABP-073	| RF07	            | US21	     | Implementar registro do agendamento	                              | Alta       |
-| ABP-074	| RF07	            | US21	     | Implementar validação de disponibilidade	                          | Alta       |
-| ABP-075	| RF07	            | US21	     | Impedir conflitos de horário	                                      | Alta       |
-| ABP-076	| RF07	            | US22	     | Implementar confirmação do agendamento	                            | Alta       |
-| ABP-077	| RF07	            | US22	     | Exibir documentos na confirmação	                                  | Alta       |
-| ABP-078	| RF07	            | US23	     | Implementar consulta do agendamento	                              | Média      |
-| ABP-079	| RF06	            | US28	     | Definir estrutura de registro das interações	                      | Alta       |
-| ABP-080	| RF06	            | US28	     | Criar modelo de interação	                                        | Alta       |
-| ABP-081	| RF06	            | US28	     | Registrar mensagens da conversa	                                  | Alta       |
-| ABP-082	| RF06	            | US28	     | Registrar fluxo percorrido	                                        | Alta       |
-| ABP-083	| RF06	            | US28	     | Registrar encaminhamentos	                                        | Alta       |
-| ABP-084	| RF06	            | US29	     | Criar contagem dos fluxos utilizados	                              | Média      |
-| ABP-085	| RF06	            | US30	     | Criar contagem dos encaminhamentos	                                | Média      |
-| ABP-086	| RNF01             | US12–US23	 | Revisar usabilidade do fluxo de atendimento	                      | Alta       |
-| ABP-087	| RNF02             | US01–US23	 | Avaliar tempo de resposta das conversas	                          | Alta       |
-| ABP-088	| RNF08             | US12–US23	 | Criar testes dos fluxos de orientação	                            | Alta       |
-| ABP-089	| RNF08             | US19–US23	 | Criar testes do módulo de agendamento	                            | Alta       |
-| ABP-090	| RF01–RF07         | US01–US23	 | Realizar teste integrado do fluxo completo	                        | Alta       |
+| ID      | Requisito | User Story | Tarefa                                                             | Prioridade |
+|---------|-----------|------------|--------------------------------------------------------------------|------------|
+| ABP-047	| RF05	    | US06	     | Definir estrutura da orientação final	                            | Alta
+| ABP-048	| RF05	    | US06	     | Criar modelo de orientação	                                        | Alta
+| ABP-049	| RF05	    | US06	     | Associar orientações aos fluxos	                                  | Alta
+| ABP-050	| RF05	    | US06	     | Implementar geração da orientação consolidada	                    | Alta
+| ABP-051	| RF05	    | US06	     | Implementar apresentação dos próximos passos	                      | Alta
+| ABP-052	| RF10	    | US08	     | Definir critérios para casos fora do escopo	                      | Alta
+| ABP-053	| RF10	    | US08	     | Implementar identificação de casos fora do escopo	                | Alta
+| ABP-054	| RF10	    | US08	     | Criar mensagens de encaminhamento	                                | Alta
+| ABP-055	| RF07	    | US09	     | Definir critérios para atendimento presencial	                    | Alta
+| ABP-056	| RF07	    | US09	     | Implementar identificação da necessidade de atendimento presencial	| Alta
+| ABP-057	| RF07	    | US09	     | Criar fluxo conversacional de encaminhamento	                      | Alta
+| ABP-058	| RF11	    | US12	     | Criar modelo de documentos necessários	                            | Alta
+| ABP-059	| RF11	    | US12	     | Associar documentos aos tipos de atendimento	                      | Alta
+| ABP-060	| RF11	    | US12	     | Implementar apresentação de documentos pelo WhatsApp	              | Alta
+| ABP-061	| RF08	    | US10	     | Criar modelo de disponibilidade	                                  | Alta
+| ABP-062	| RF08	    | US10	     | Implementar cadastro de datas disponíveis	                        | Alta
+| ABP-063	| RF08	    | US10	     | Implementar cadastro de horários disponíveis	                      | Alta
+| ABP-064	| RF08	    | US10	     | Implementar consulta de disponibilidade	                          | Alta
+| ABP-065	| RF07	    | US10	     | Implementar seleção de data pelo WhatsApp	                        | Alta
+| ABP-066	| RF07	    | US10	     | Implementar seleção de horário pelo WhatsApp	                      | Alta
+| ABP-067	| RF07	    | US11	     | Criar modelo de agendamento	                                      | Alta
+| ABP-068	| RF07	    | US11	     | Implementar registro do agendamento	                              |Alta
+| ABP-069	| RF07	    | US11	     | Implementar validação da disponibilidade	                          |Alta
+| ABP-070	| RF07	    | US11	     | Implementar prevenção de conflitos de horário	                    |Alta
+| ABP-071	| RF07	    | US11	     | Implementar confirmação do agendamento pelo WhatsApp	              |Alta
+| ABP-072	| RF07	    | US11	     | Implementar encerramento da sessão após o agendamento	            |Alta
+| ABP-073	| RF07	    | US11	     | Definir estratégia de lembrete do atendimento	                    |Média
+| ABP-074	| RF07	    | US11	     | Implementar envio de lembrete próximo ao atendimento	              |Média
+| ABP-075	| RF06	    | US15	     | Definir estrutura de registro das interações	                      |Alta
+| ABP-076	| RF06	    | US15	     | Criar modelo de interação	                                        |Alta
+| ABP-077	| RF06	    | US15	     | Registrar mensagens da conversa	                                  |Alta
+| ABP-078	| RF06	    | US15	     | Registrar fluxo percorrido	                                        |Alta
+| ABP-079	| RF06	    | US15	     | Registrar resultado do atendimento                                 |	Alta
+| ABP-080	| RF06	    | US15	     | Registrar encaminhamento presencial	                              |Alta
+| ABP-081	| RF06	    | US15	     | Implementar consulta básica dos registros	                        |Média
+| ABP-082	| RNF01	    | US01–US12	 | Revisar usabilidade do fluxo conversacional	                      |Alta
+| ABP-083	| RNF02	    | US01–US12	 | Avaliar tempo de resposta do chatbot	                              |Alta
+| ABP-084	| RNF08	    | US06–US12	 | Criar testes dos fluxos de orientação	                            |Alta
+| ABP-085	| RNF08	    | US09–US12	 | Criar testes do fluxo de agendamento	                              |Alta
+| ABP-086	| RF01–RF11	| US01–US12	 | Realizar teste integrado completo pelo WhatsApp                    |Alta
 
 ---
 
