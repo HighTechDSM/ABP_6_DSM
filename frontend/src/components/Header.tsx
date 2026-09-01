@@ -8,13 +8,12 @@ function Header() {
         <img src={logo} alt="PROCON Jacareí" className="header-logo" />
         <div>
           <strong>PROCON Jacareí</strong>
-          <span>Orientação ao consumidor</span>
+          <span>Portal do funcionário</span>
         </div>
       </div>
 
       <div className="header__actions">
-        <span className="header__environment"><Icon name="shield" size={15} /> Ambiente protegido</span>
-        <span className="header__context"><span aria-hidden="true" /> Canal digital</span>
+        <span className="header__environment"><Icon name="lock" size={15} /> Ambiente interno</span>
       </div>
     </header>
   )

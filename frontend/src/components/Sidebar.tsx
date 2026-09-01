@@ -7,8 +7,8 @@ function Sidebar() {
       <nav aria-label="Navegação principal">
         <span className="sidebar__label">Menu principal</span>
         <NavLink to="/inicio"><Icon name="home" /> <span>Início</span></NavLink>
-        <NavLink to="/conversa"><Icon name="message-circle" /> <span>Conversa</span></NavLink>
-        <NavLink to="/historico"><Icon name="history" /> <span>Histórico</span></NavLink>
+        <NavLink to="/agendamentos"><Icon name="calendar" /> <span>Agendamentos</span></NavLink>
+        <NavLink to="/disponibilidade"><Icon name="clock" /> <span>Disponibilidade</span></NavLink>
       </nav>
 
       <div className="sidebar__privacy">
