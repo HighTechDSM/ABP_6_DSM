@@ -27,7 +27,7 @@ O sistema é composto por:
 
 ### Ferramentas
 <p>
-  <img src="https://skillicons.dev/icons?i=git,github,figma,vscode,docker" />
+  <img src="https://skillicons.dev/icons?i=git,github,vscode,docker" />
 </p>
 
 ---
@@ -35,91 +35,117 @@ O sistema é composto por:
 
 ## Requisitos funcionais
 
-| ID   | Requisito                 | Descrição                                                                                          |
-|------|---------------------------|----------------------------------------------------------------------------------------------------|
-| RF01 | Atendimento inicial       | Permitir que o consumidor inicie um atendimento através do WhatsApp.                               |
-| RF02 | Identificação e sessão    | Identificar o consumidor e manter o contexto de sua sessão de atendimento.                         |
-| RF03 | Categorias de atendimento | Apresentar categorias de problemas para direcionar o consumidor ao fluxo adequado.                 |
-| RF04 | Fluxos decisórios         | Conduzir o consumidor por perguntas e alternativas de acordo com seu problema.                     |
-| RF05 | Orientação ao consumidor  | Apresentar uma orientação consolidada e os próximos passos recomendados.                           |
-| RF06 | Registro de atendimentos  | Registrar as interações realizadas durante os atendimentos.                                        |
-| RF07 | Atendimento presencial	   | Permitir o encaminhamento para atendimento presencial quando o chatbot não solucionar o problema.  |
-| RF08 | Gestão de agendamentos	   | Permitir que funcionários consultem e gerenciem os atendimentos agendados.                         |
-| RF09 | Base de conhecimento	     | Utilizar informações oficiais do PROCON para alimentar as respostas do chatbot.                    |
-| RF10 | Casos fora do escopo	     | Identificar quando o problema apresentado não está dentro do escopo de atuação do PROCON.          |
-| RF11 | Documentos necessários	   | Informar os documentos necessários para o atendimento presencial.                                  |
-| RF12 | Aprendizado contínuo	     | Registrar e analisar atendimentos para identificar novos casos e aprimorar a base de conhecimento. |
+| ID   | Requisito                         | Descrição                                                                                                                                         |
+|------|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| RF01 | Atendimento via WhatsApp          | Permitir que o consumidor inicie e realize o atendimento exclusivamente por meio do WhatsApp.                                                     |
+| RF02 | Identificação e sessão            | Identificar o consumidor e manter o contexto da sessão durante o atendimento.                                                                     |
+| RF03 | Menus e categorias de atendimento | Apresentar menus e categorias de problemas para direcionar o consumidor ao atendimento adequado.                                                  |
+| RF04 | Fluxos decisórios                 | Conduzir o consumidor por perguntas e alternativas sequenciais de acordo com os fluxos fornecidos pelo PROCON.                                    |
+| RF05 | Orientação ao consumidor          | Apresentar uma orientação consolidada e os próximos passos recomendados ao final do fluxo.                                                        |
+| RF06 | Registro das interações           | Registrar as mensagens, respostas e etapas realizadas durante o atendimento.                                                                      |
+| RF07 | Encaminhamento presencial         | Identificar quando a orientação não solucionou o problema e oferecer encaminhamento para atendimento presencial.                                  |
+| RF08 | Agendamento via WhatsApp          | Permitir que o consumidor consulte horários disponíveis e realize o agendamento diretamente pelo WhatsApp.                                        |
+| RF09 | Documentos necessários            | Informar os documentos recomendados para o atendimento presencial de acordo com o caso apresentado.                                               |
+| RF10 | Gestão de atendimentos	           | Permitir que os funcionários do PROCON consultem os atendimentos presenciais sob sua responsabilidade.                                            |
+| RF11 | Contexto da conversa	             | Permitir que o funcionário visualize o histórico e o contexto do atendimento realizado pelo chatbot antes do atendimento presencial.              |
+| RF12 | Lembretes de atendimento	         | Enviar lembretes ao consumidor quando a data do atendimento presencial estiver próxima.                                                           |
+| RF13 | Base de conhecimento	             | Utilizar informações e documentos oficiais fornecidos pelo PROCON como fonte para as respostas e orientações do chatbot.                          |
+| RF14 | Casos fora do escopo	             | Identificar e informar quando o problema apresentado não estiver dentro do escopo de atuação do PROCON.                                           |
+| RF15 | Aprendizado contínuo	             | Registrar e analisar atendimentos para identificar novos casos e oportunidades de aprimoramento da base de conhecimento.                          |  
+| RF16 | Validação de conhecimento         | Garantir que novos conhecimentos identificados durante os atendimentos sejam validados antes de serem incorporados à base utilizada pelo chatbot. |
 
 ## Requisitos não funcionais
 
-| ID    | Requisito                 | Descrição                                                                                                  |
-|-------|---------------------------|------------------------------------------------------------------------------------------------------------|
-| RNF01 | Usabilidade               | As mensagens devem ser claras, objetivas e compreensíveis.                                                 |
-| RNF02 | Desempenho                | O sistema deve apresentar tempo de resposta adequado durante o atendimento.                                |
-| RNF03 | Segurança e LGPD          | Os dados dos consumidores devem ser tratados de acordo com a LGPD.                                         |
-| RNF04 | Caráter orientativo       | O sistema deve informar que as respostas possuem caráter orientativo.                                      |
-| RNF05 | Transparência da IA       | O consumidor deve ser informado quando houver utilização de modelo de linguagem/IA na geração da resposta. |
-| RNF06 | Containerização           | O sistema deve poder ser executado utilizando Docker.                                                      |
-| RNF07 | Documentação              | O projeto deve possuir documentação de instalação, configuração e utilização.                              |
-| RNF08 | Qualidade e versionamento | O projeto deve utilizar controle de versão, testes automatizados, revisão de código e integração contínua. |
+| ID    | Requisito             | Descrição                                                                                                                          |
+|-------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| RNF01	| Usabilidade	          | As mensagens enviadas pelo chatbot devem utilizar linguagem clara, objetiva e compreensível.                                       |
+| RNF02	| Desempenho            | O sistema deve apresentar tempo de resposta adequado durante as conversas e operações de agendamento.                              |
+| RNF03	| Segurança e LGPD      | Os dados dos consumidores e funcionários devem ser tratados de acordo com as práticas de segurança e com a LGPD.                   |
+| RNF04	| Caráter orientativo	  | O chatbot deve informar claramente que suas respostas possuem caráter orientativo e não substituem o atendimento formal do PROCON. |
+| RNF05	| Transparência da IA	  | O consumidor deve ser informado quando houver utilização de recursos de IA ou modelos de linguagem na elaboração de uma resposta.  |
+| RNF06	| Containerização	      | O sistema deve poder ser executado utilizando Docker.                                                                              |
+| RNF07	| Documentação          | O projeto deve possuir documentação sobre instalação, configuração, arquitetura e utilização.                                      |
+| RNF08	| Qualidade de software	| O projeto deve utilizar versionamento, testes, revisão de código e integração contínua.                                            |
+| RNF09	| Disponibilidade	      | Os serviços responsáveis pelo atendimento devem possuir disponibilidade adequada para permitir o funcionamento das conversas.      |
 
 ## Restrições do projeto
 
-| ID   | Requisito                  | Descrição                                                                                                 |
-|------|----------------------------|-----------------------------------------------------------------------------------------------------------|
-| RP01 | Integração WhatsApp        | Utilizar uma API do WhatsApp para envio e recebimento de mensagens.                                       |
-| RP02 | Backend                    | Utilizar uma tecnologia web para desenvolvimento do backend.                                              |
-| RP03 | Arquitetura modular        | Separar chatbot, fluxos decisórios, base de conhecimento, IA e integrações.                               |
-| RP04 | MVP                        | Priorizar funcionalidades essenciais compatíveis com o prazo do semestre.                                 |
-| RP05 | IA sem API externa de LLM  | O projeto não deverá utilizar uma API externa de LLM para o processamento principal da IA.                |
-| RP06 | Interface simulada         | Desenvolver uma interface própria que simule a experiência de conversa do WhatsApp.                       |
-| RP07 | Base oficial               | Utilizar o documento de Dúvidas Frequentes fornecido pelo PROCON como fonte inicial de conhecimento.      |
-| RP08 | Agendamento                | Desenvolver a interface própria para encaminhamento e agendamento do atendimento presencial.              |
-| RP09 | Aprendizado supervisionado | Os atendimentos poderão gerar novos conhecimentos, mas a incorporação à base deverá passar por validação. | 
+| ID   | Requisito                     | Descrição                                                                                                                        |
+|------|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| RP01 | Integração WhatsApp           | Utilizar uma API compatível com WhatsApp para envio e recebimento das mensagens.                                                 |
+| RP02 | Backend Web                   | Utilizar uma tecnologia compatível com aplicações web modernas para o desenvolvimento do backend.                                |
+| RP03 | Arquitetura modular           | Separar os módulos de integração com WhatsApp, chatbot, fluxos decisórios, conhecimento, agendamento e demais regras de negócio. |
+| RP04 | MVP                           | Priorizar funcionalidades essenciais compatíveis com o prazo disponível durante o semestre.                                      |
+| RP05 | IA sem API externa de LLM     | Não utilizar APIs externas de LLM como mecanismo principal de processamento das orientações do sistema.                          |
+| RP06 | WhatsApp como canal principal | Todo o atendimento do consumidor, incluindo orientação e agendamento, deverá ocorrer por meio do WhatsApp.                       |
+| RP07 | Base oficial	                 | Utilizar os documentos e informações fornecidos pelo PROCON como fonte inicial da base de conhecimento.                          |
+| RP08 | Painel Web do funcionário     | Desenvolver uma interface Web destinada aos funcionários do PROCON para consulta dos atendimentos agendados.                     |
+| RP09 | Aprendizado supervisionado	   | Os atendimentos poderão gerar novos conhecimentos, porém sua incorporação à base deverá passar por validação.                    |
+| RP10 | Contexto do atendimento       | O funcionário deverá ter acesso ao contexto da conversa relacionada ao atendimento presencial agendado.                          |
 
 ---
 
 # PRODUCT BACKLOG
 
-|ID     | Requisito      | User Story                                                                                                          | Prioridade |
-|-------|----------------|---------------------------------------------------------------------------------------------------------------------|------------|
-| PB01	| RF01	         | Como consumidor, quero iniciar uma conversa pelo WhatsApp para obter orientação do PROCON.	                         | Alta       |
-| PB02	| RF01	         | Como sistema, quero identificar o usuário e controlar sua sessão de atendimento.	                                   | Alta	      |
-| PB03	| RF02	         | Como consumidor, quero receber opções de atendimento para identificar meu problema.	                               | Alta       |	
-| PB04  | RF02	         | Como administrador, quero cadastrar os fluxos decisórios do PROCON para que o chatbot utilize informações oficiais. | Alta       |	
-| PB05	| RF03	         | Como consumidor, quero responder perguntas sequenciais para chegar ao fluxo adequado ao meu problema.               | Alta	      |
-| PB06	| RF03	         | Como sistema, quero controlar o estado da conversa para manter o usuário no fluxo correto.                          | Alta       |
-| PB07	| RF04	         | Como consumidor, quero receber uma orientação consolidada ao final do fluxo.	                                       | Alta       |
-| PB08	| RF04	         | Como consumidor, quero saber quais são os próximos passos recomendados para meu caso.                               | Alta       |
-| PB09	| RF05	         | Como consumidor, quero receber uma explicação textual clara sobre a orientação apresentada.                         | Média      |
-| PB10	| RF06	         | Como PROCON, quero registrar as interações para identificar os fluxos mais utilizados.	                             | Alta	      |
-| PB11	| RF07	         | Como consumidor, quero solicitar atendimento presencial quando o chatbot não solucionar minha dúvida.               | Alta       |
-| PB12	| RF07	         | Como consumidor, quero visualizar os horários disponíveis para atendimento presencial.                              | Alta	      |
-| PB13	| RF07	         | Como consumidor, quero realizar o agendamento pelo chatbot.                                                         | Alta       |
-| PB14	| RF07	         | Como consumidor, quero saber quais documentos devo levar ao atendimento.	                                           | Alta       |
-| PB15	| RF08	         | Como funcionário do PROCON, quero visualizar os atendimentos agendados.                                             | Alta	      |
-| PB16	| RF08	         | Como funcionário do PROCON, quero consultar os dados necessários para o atendimento agendado.                       | Alta	      |
-| PB17	| RNF01	         | Como consumidor, quero receber mensagens claras e objetivas para compreender facilmente as orientações.             | Alta       |
-| PB18	| RNF03	         | Como PROCON, quero que os dados dos usuários sejam tratados de acordo com a LGPD.                                   | Alta	      |
-| PB19	| RNF04	         | Como consumidor, quero saber que a resposta do chatbot possui caráter orientativo.	                                 | Alta       |
-| PB20	| RNF05	         | Como consumidor, quero saber quando uma resposta recebeu auxílio de um modelo de linguagem.                         | Média      |
-| PB21	| RNF06	         | Como desenvolvedor, quero executar o sistema através de Docker.                                                     | Alta	      |
-| PB22	| RNF07	         | Como desenvolvedor, quero documentar a instalação e os requisitos do sistema.                                       | Alta       |
-| PB23	| RNF08	         | Como equipe, quero utilizar versionamento e GitHub Flow para controlar o desenvolvimento.                           | Alta       |
-| PB24	| RNF08	         | Como equipe, quero possuir testes automatizados para validar o sistema.                                             | Alta       |
-| PB25	| RNF08	         | Como equipe, quero utilizar CI/CD para automatizar validações e entregas.                                           | Média      |
-| PB26	| RP01	         | Como sistema, quero receber e enviar mensagens através da integração com WhatsApp.                                  | Alta       |
-| PB27	| RP02	         | Como desenvolvedor, quero implementar o backend com uma tecnologia web moderna.                                     | Alta       |
-| PB28	| RP03	         | Como desenvolvedor, quero separar a lógica do chatbot, fluxos decisórios e integração com IA.                       | Alta       |
-| PB29	| RP04	         | Como equipe, quero priorizar um MVP compatível com o prazo do semestre.                                             | Alta       |
-| PB30	| RP05	         | Como equipe, quero garantir que nenhuma API externa de LLM seja utilizada.                                          | Alta       |
-| PB31	| RF02/RF03      | Como consumidor, quero selecionar uma categoria de problema para iniciar meu atendimento.                           | Alta       |
-| PB32	| RP03           | Como consumidor, quero receber perguntas específicas para a categoria selecionada.                                  | Alta       |
-| PB33	| RF02/RF03      | Como sistema, quero armazenar as perguntas e respostas da base de conhecimento.                                     | Alta       |
-| PB34	| RF02/RF03/RF08 | Como administrador, quero atualizar as perguntas e respostas sem alterar o código do chatbot.                       | Média      |
-| PB35	| RF04/RF07      | Como consumidor, quero saber quando meu caso não está dentro do escopo de atuação do PROCON.                        | Alta       |
-| PB36	| RF07           | Como consumidor, quero receber a lista de documentos necessários para meu caso.                                     | Alta       |
-
+|ID    | Requisito  | User Story                                                                                                                                         | Prioridade |
+|------|------------|----------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| PB01 | RF01       | Como consumidor, quero iniciar um atendimento pelo WhatsApp para obter orientação do PROCON sem precisar me deslocar inicialmente até uma unidade. | Alta       |
+| PB02 | RF01	      | Como consumidor, quero interagir com o chatbot utilizando mensagens e menus para receber orientação sobre meu problema.                            | Alta       |
+| PB03 | RF02	      | Como sistema, quero identificar o consumidor para associar suas mensagens ao atendimento correto.	                                                 | Alta       |
+| PB04 | RF02	      | Como sistema, quero manter o contexto da sessão para garantir a continuidade correta da conversa.	                                                 | Alta       |
+| PB05 | RP01	      | Como sistema, quero receber mensagens enviadas pelo consumidor através da integração com a API do WhatsApp.	                                       | Alta       |
+| PB06 | RP01	      | Como sistema, quero enviar respostas ao consumidor através da integração com a API do WhatsApp.	                                                   | Alta       |
+| PB07 | RF03	      | Como consumidor, quero visualizar opções de atendimento para identificar a categoria relacionada ao meu problema.	                                 | Alta       |
+| PB08 | RF03	      | Como consumidor, quero selecionar uma categoria para iniciar o fluxo correspondente ao meu problema.                                               | Alta       |
+| PB09 | RF04	      | Como consumidor, quero responder perguntas sequenciais para que o chatbot compreenda melhor minha situação.	                                       | Alta       |
+| PB10 | RF04	      | Como sistema, quero controlar a etapa atual do fluxo para manter o consumidor no caminho correto do atendimento.                                   | Alta       |
+| PB11 | RF04	      | Como consumidor, quero receber perguntas e alternativas relacionadas às respostas que forneci anteriormente.                                       | Alta       |
+| PB12 | RF04	      | Como sistema, quero determinar a próxima pergunta de acordo com a resposta selecionada pelo consumidor.                                            | Alta       |
+| PB13 | RF05	      | Como consumidor, quero receber uma orientação consolidada ao final do atendimento para compreender minha situação.                                 | Alta       |
+| PB14 | RF05	      | Como consumidor, quero receber os próximos passos recomendados para saber como proceder após a orientação.                                         | Alta       |
+| PB15 | RF14	      | Como consumidor, quero ser informado quando meu problema não estiver dentro do escopo de atuação do PROCON.	                                       | Alta       |
+| PB16 | RNF01      | Como consumidor, quero receber mensagens claras e objetivas para compreender facilmente as orientações.	                                           | Alta       |
+| PB17 | RNF04      | Como consumidor, quero ser informado de que as orientações fornecidas possuem caráter orientativo.                                                 | Alta       |
+| PB18 | RNF05      | Como consumidor, quero saber quando uma resposta utilizar recursos de IA ou modelo de linguagem.                                                   | Média      |
+| PB19 | RF13	      | Como PROCON, quero utilizar informações oficiais para garantir que o chatbot forneça orientações baseadas em fontes confiáveis.	                   | Alta       |
+| PB20 | RF13	      | Como sistema, quero armazenar perguntas, respostas e informações utilizadas pelo chatbot.	                                                         | Alta       |
+| PB21 | RF13	      | Como administrador, quero atualizar a base de conhecimento sem precisar alterar diretamente o código do chatbot.                                   | Média      |
+| PB22 | RP07	      | Como equipe, quero estruturar o documento de Dúvidas Frequentes como fonte inicial da base de conhecimento.	                                       | Alta       |
+| PB23 | RF07	      | Como consumidor, quero ser encaminhado para atendimento presencial quando o chatbot não conseguir solucionar meu problema.                         | Alta       |
+| PB24 | RF08	      | Como consumidor, quero visualizar datas disponíveis para escolher quando desejo realizar meu atendimento presencial.                               | Alta       |
+| PB25 | RF08	      | Como consumidor, quero visualizar horários disponíveis para escolher um horário adequado para meu atendimento.                                     | Alta       |
+| PB26 | RF08	      | Como consumidor, quero realizar o agendamento diretamente pelo WhatsApp para não precisar acessar outro sistema.                                   | Alta       |
+| PB27 | RF08	      | Como consumidor, quero receber uma confirmação do meu agendamento pelo WhatsApp.                                                                   | Alta       |
+| PB28 | RF09	      | Como consumidor, quero saber quais documentos devo levar ao atendimento presencial de acordo com meu caso.                                         | Alta       |
+| PB29 | RF12	      | Como consumidor, quero receber um lembrete quando meu atendimento estiver próximo para não esquecer a data agendada.                               | Média      |
+| PB30 | RF10	      | Como funcionário do PROCON, quero visualizar os atendimentos agendados sob minha responsabilidade.                                                 | Alta       |
+| PB31 | RF10	      | Como funcionário do PROCON, quero visualizar os dados do consumidor que irei atender.	                                                             | Alta       |
+| PB32 | RF10	      | Como funcionário do PROCON, quero visualizar a data e o horário dos meus atendimentos.                                                             | Alta       |
+| PB33 | RF11	      | Como funcionário do PROCON, quero visualizar o contexto da conversa realizada pelo chatbot antes do atendimento presencial.                        | Alta       |
+| PB34 | RF11	      | Como funcionário do PROCON, quero visualizar as respostas fornecidas pelo consumidor durante o fluxo para compreender previamente o caso.	         | Alta       |
+| PB35 | RF11	      | Como funcionário do PROCON, quero visualizar o motivo do encaminhamento para atendimento presencial.                                               | Alta       |
+| PB36 | RF06	      | Como PROCON, quero registrar as interações realizadas para analisar os atendimentos e os fluxos mais utilizados.                                   | Alta       |
+| PB37 | RF06	      | Como sistema, quero registrar o resultado de cada atendimento para identificar se o problema foi solucionado ou encaminhado.                       | Alta       |
+| PB38 | RF15	      | Como sistema, quero identificar casos relevantes nos atendimentos para analisar possíveis melhorias na base de conhecimento.                       | Média      |
+| PB39 | RF15	      | Como equipe do PROCON, quero analisar casos não solucionados para identificar novas dúvidas e necessidades de orientação.	                         | Média      |
+| PB40 | RF16	      | Como responsável pela base de conhecimento, quero validar novos conhecimentos antes que sejam utilizados pelo chatbot.                             | Alta       |
+| PB41 | RP09	      | Como sistema, quero impedir que novos conhecimentos sejam incorporados automaticamente sem validação.	                                             | Alta       |
+| PB42 | RNF03      | Como consumidor, quero que meus dados sejam tratados adequadamente para proteger minhas informações pessoais.	                                     | Alta       |
+| PB43 | RNF02      | Como consumidor, quero receber respostas em tempo adequado para ter uma experiência satisfatória durante o atendimento.	                           | Alta       |
+| PB44 | RNF06      | Como desenvolvedor, quero executar o sistema utilizando Docker para facilitar a configuração do ambiente.	                                         | Alta       |
+| PB45 | RNF07      | Como desenvolvedor, quero possuir documentação de instalação e configuração para facilitar a execução do projeto.	                                 | Alta       |
+| PB46 | RNF08      | Como equipe, quero utilizar versionamento de código para controlar o desenvolvimento do projeto.                                                   | Alta       |
+| PB47 | RNF08      | Como equipe, quero possuir testes automatizados para validar as principais funcionalidades do sistema.                                             | Alta       |
+| PB48 | RNF08      | Como equipe, quero realizar revisão de código para manter a qualidade da aplicação.	                                                               | Média      |
+| PB49 | RNF08      | Como equipe, quero utilizar integração contínua para automatizar a validação do projeto.	                                                         | Média      |
+| PB50 | RP02	      | Como equipe, quero definir uma tecnologia web adequada para implementar o backend da aplicação.	                                                   | Alta       |
+| PB51 | RP03	      | Como desenvolvedor, quero separar os módulos do sistema para facilitar manutenção e evolução da aplicação.                                       	 | Alta       |
+| PB52 | RP03	      | Como desenvolvedor, quero separar a integração do WhatsApp da lógica do chatbot para reduzir o acoplamento entre os componentes.	                 | Alta       |
+| PB53 | RP04	      | Como equipe, quero priorizar as funcionalidades essenciais para garantir a entrega de um MVP funcional dentro do semestre.	                       | Alta       |
+| PB54 | RP05	      | Como equipe, quero garantir que nenhuma API externa de LLM seja utilizada como dependência principal do sistema.	                                 | Alta       |
+| PB55 | RP06	      | Como consumidor, quero realizar todo o atendimento e agendamento pelo WhatsApp para não precisar utilizar outra aplicação.	                       | Alta       |
+| PB56 | RP08	      | Como funcionário do PROCON, quero utilizar uma interface Web para consultar os atendimentos presenciais.	                                         | Alta       |
+| PB57 | RP10  	    | Como funcionário do PROCON, quero acessar o contexto da conversa associado ao agendamento para me preparar antes do atendimento.	                 | Alta       |
 ---
 
 # USER STORIES
@@ -132,16 +158,12 @@ O sistema é composto por:
 
 **Para** obter orientação sobre um problema de consumo sem precisar comparecer inicialmente ao PROCON.
 
-### Critérios de aceitação:
-
-- O usuário consegue enviar uma mensagem ao chatbot.
-  
-- O sistema identifica uma nova sessão.
-  
+### Critérios de aceitação
+-  O usuário consegue iniciar uma conversa pelo canal oficial do WhatsApp.
+- O sistema recebe a mensagem enviada pelo usuário.
+- O sistema identifica uma nova sessão de atendimento quando necessário.
 - O chatbot apresenta uma mensagem inicial.
-  
-- O chatbot informa que possui caráter orientativo.
-  
+- O chatbot informa que o atendimento possui caráter orientativo.
 - O usuário consegue iniciar o fluxo de atendimento.
 
 ## US02 — Identificar usuário e sessão
@@ -152,17 +174,13 @@ O sistema é composto por:
 
 **Para** continuar a conversa sem perder o contexto do meu problema.
 
-### Critérios de aceitação:
-
-- O sistema identifica o usuário.
-
-- O sistema verifica se existe uma sessão ativa.
-  
+### Critérios de aceitação
+- O sistema identifica o consumidor associado à conversa.
+- O sistema verifica se existe uma sessão de atendimento ativa.
 - Uma nova sessão é criada quando necessário.
-  
-- O sistema recupera uma sessão existente quando aplicável.
-  
+- Uma sessão existente é recuperada quando aplicável.
 - As mensagens ficam associadas à sessão correta.
+- O contexto do atendimento é mantido durante a conversa.
 
 ## US03 — Selecionar categoria do problema
 
@@ -172,38 +190,28 @@ O sistema é composto por:
 
 **Para** ser direcionado ao fluxo de atendimento adequado.
 
-### Critérios de aceitação:
-
-- O sistema apresenta categorias disponíveis.
-  
-- As categorias são baseadas na documentação do PROCON.
-  
-- O usuário consegue selecionar uma categoria.
-  
+### Critérios de aceitação
+- O chatbot apresenta as categorias disponíveis.
+- As categorias são baseadas nas informações oficiais utilizadas pelo projeto.
+- O usuário consegue selecionar uma categoria por meio do WhatsApp.
 - A categoria selecionada é associada à sessão.
-  
 - O sistema direciona o usuário ao fluxo correspondente.
-  
+
 ## US04 — Navegar pelo fluxo decisório
 
 **Como** consumidor
 
 **Quero** responder perguntas apresentadas pelo chatbot
 
-**Para** identificar o fluxo correspondente ao meu problema.
+**Para** fornecer informações sobre meu problema e receber uma orientação adequada.
 
-### Critérios de aceitação:
+### Critérios de aceitação
+- O chatbot apresenta uma pergunta ao consumidor.
+- O usuário recebe opções de resposta quando aplicável.
+- Cada resposta direciona o atendimento para a próxima etapa correta.
+- O sistema mantém o estado atual do fluxo.
+- O fluxo é concluído com uma orientação, encaminhamento ou identificação de caso fora do escopo.
 
-- O sistema apresenta uma pergunta.
-
-- O usuário recebe opções de resposta.
-  
-- Cada opção direciona para o próximo passo correto.
-  
-- O sistema mantém o estado da conversa.
-  
-- O fluxo termina em uma orientação ou encaminhamento.
-  
 ## US05 — Responder perguntas condicionais
 
 **Como** consumidor
@@ -212,17 +220,12 @@ O sistema é composto por:
 
 **Para** fornecer somente as informações necessárias para analisar meu caso.
 
-### Critérios de aceitação:
-
-- O sistema considera respostas anteriores.
-  
-- O sistema identifica a próxima pergunta.
-  
-- Perguntas diferentes podem ser apresentadas de acordo com as respostas.
-  
-- O sistema não apresenta perguntas desnecessárias quando uma condição já foi satisfeita.
-  
-- O fluxo mantém o contexto até sua conclusão.
+### Critérios de aceitação
+- O sistema considera as respostas anteriores do consumidor.
+- O sistema identifica a próxima pergunta de acordo com as regras do fluxo.
+- Perguntas diferentes podem ser apresentadas dependendo das respostas anteriores.
+- O sistema evita apresentar perguntas desnecessárias.
+- O contexto do fluxo é mantido até sua conclusão.
 
 ## US06 — Receber orientação
 
@@ -230,19 +233,15 @@ O sistema é composto por:
 
 **Quero** receber uma orientação consolidada
 
-**Para** entender quais medidas posso tomar.
+**Para** entender quais medidas posso tomar em relação ao meu problema.
 
-### Critérios de aceitação:
-
-- O sistema apresenta um resumo do problema identificado.
-  
-- Apresenta a orientação correspondente.
-  
-- Apresenta os próximos passos.
-  
-- Informa quando o caso necessita de atendimento presencial.
-  
-- A resposta deixa claro que possui caráter orientativo.
+### Critérios de aceitação
+- O sistema identifica o resultado do fluxo realizado.
+- O chatbot apresenta uma orientação correspondente ao caso.
+- O sistema apresenta os próximos passos recomendados.
+- A linguagem utilizada é clara e objetiva.
+- A resposta informa que possui caráter orientativo.
+- O sistema identifica quando é necessário encaminhar o consumidor para atendimento presencial.
 
 ## US07 — Consultar informações da base de conhecimento
 
@@ -252,17 +251,12 @@ O sistema é composto por:
 
 **Para** obter orientações confiáveis sobre meu problema.
 
-### Critérios de aceitação:
-
-- O chatbot consulta a base de conhecimento.
-  
-- As informações utilizadas têm origem na documentação oficial definida para o projeto.
-  
-- As respostas são relacionadas ao problema apresentado.
-  
-- O conteúdo utilizado pode ser atualizado pela equipe responsável.
-  
-- O sistema não deve apresentar informações não validadas como orientação oficial.
+### Critérios de aceitação
+- O chatbot consulta a base de conhecimento quando necessário.
+- As informações utilizadas possuem origem em fontes oficiais definidas pelo projeto.
+- As respostas apresentadas são relacionadas ao problema informado.
+- O conteúdo da base pode ser atualizado pela equipe responsável.
+- Informações não validadas não são apresentadas como orientação oficial.
 
 ## US08 — Identificar caso fora do escopo
 
@@ -272,15 +266,11 @@ O sistema é composto por:
 
 **Para** não receber uma orientação inadequada.
 
-### Critérios de aceitação:
-
-- O sistema identifica casos fora do escopo conhecido.
-  
-- O chatbot informa que o caso não está dentro de sua área de atuação.
-  
-- O sistema evita apresentar uma orientação como se fosse aplicável.
-  
-- Quando possível, o usuário recebe orientação sobre o próximo passo.
+### Critérios de aceitação
+- O sistema identifica situações que não correspondem aos fluxos ou categorias disponíveis.
+- O chatbot informa claramente quando não possui uma orientação aplicável ao caso.
+- O sistema não apresenta informações como orientação oficial quando não houver base validada.
+- Quando possível, o consumidor recebe uma indicação sobre os próximos passos.
 
 ## US09 — Solicitar atendimento presencial
 
@@ -288,55 +278,47 @@ O sistema é composto por:
 
 **Quero** solicitar atendimento presencial
 
-**Para** resolver problemas que não foram solucionados pelo chatbot.
+**Para** buscar ajuda quando meu problema não puder ser solucionado pelo chatbot.
 
-### Critérios de aceitação:
+### Critérios de aceitação
+- O chatbot identifica situações que necessitam de atendimento presencial.
+- O consumidor recebe a opção de realizar um agendamento.
+- O agendamento é iniciado diretamente pelo WhatsApp.
+- O contexto necessário do atendimento é associado ao agendamento.
+- O consumidor não precisa acessar outra aplicação para realizar o agendamento.
 
-- O chatbot identifica a necessidade de atendimento presencial.
-  
-- O usuário recebe a opção de realizar o agendamento.
-  
-- O usuário é direcionado para a interface de agendamento.
-  
-- O contexto necessário do atendimento é encaminhado para o agendamento.
-
-## US10 — Consultar horários disponíveis
+## US10 — Consultar datas e horários disponíveis
 
 **Como** consumidor
 
-**Quero** visualizar os horários disponíveis
+**Quero** visualizar as datas e horários disponíveis
 
-**Para** escolher uma data e horário para meu atendimento.
+**Para** escolher um momento adequado para meu atendimento presencial.
 
-### Critérios de aceitação:
- 
-- O sistema apresenta datas disponíveis.
-
-- O sistema apresenta horários disponíveis.
-  
+### Critérios de aceitação
+- O chatbot apresenta as datas disponíveis.
+- O consumidor consegue selecionar uma data.
+- O sistema apresenta os horários disponíveis para a data selecionada.
 - Horários indisponíveis não podem ser selecionados.
-  
-- Os horários são atualizados conforme os agendamentos realizados.
+- A disponibilidade é atualizada conforme novos agendamentos são realizados.
 
 ## US11 — Realizar agendamento
 
 **Como** consumidor
 
-**Quero** realizar meu agendamento
+**Quero** realizar meu agendamento pelo WhatsApp
 
-**Para** garantir um horário de atendimento presencial no PROCON.
+**Para** garantir um horário para meu atendimento presencial no PROCON.
 
-### Critérios de aceitação:
-
-- O usuário consegue selecionar data e horário.
-
-- O sistema solicita os dados necessários.
-
-- O sistema valida os dados informados.
-
-- O agendamento é registrado.
-
-- O usuário recebe confirmação do agendamento.
+### Critérios de aceitação
+- O consumidor consegue selecionar uma data disponível.
+- O consumidor consegue selecionar um horário disponível.
+- O sistema solicita os dados necessários para o agendamento.
+- Os dados informados são validados.
+- O agendamento é registrado no sistema.
+- O horário selecionado deixa de ficar disponível.
+- O consumidor recebe uma confirmação pelo WhatsApp.
+- Após a confirmação, o fluxo de atendimento é encerrado.
 
 ## US12 — Consultar documentos necessários
 
@@ -344,55 +326,82 @@ O sistema é composto por:
 
 **Quero** saber quais documentos devo apresentar
 
-**Para** chegar ao atendimento presencial com a documentação adequada.
+**Para** comparecer ao atendimento presencial com a documentação adequada.
 
-Critérios de aceitação:
+### Critérios de aceitação
+- O sistema identifica os documentos relacionados ao caso.
+- Os documentos são apresentados de maneira organizada.
+- O consumidor recebe a informação pelo WhatsApp.
+- O sistema informa que documentos adicionais podem ser solicitados.
+- As informações sobre documentação ficam associadas ao contexto do atendimento.
 
-- O sistema identifica os documentos associados ao caso.
+## US13 — Receber lembrete do atendimento
 
-- Apresenta os documentos de maneira organizada.
+**Como** consumidor
 
-- Informa que documentos adicionais podem ser solicitados.
+**Quero** receber um lembrete antes do meu atendimento
 
-- Permite continuar para o agendamento.
+**Para** não esquecer a data e o horário agendados.
 
-## US13 — Visualizar agendamentos
+### Critérios de aceitação
+- O sistema identifica atendimentos próximos.
+- O sistema envia um lembrete pelo WhatsApp.
+- O lembrete informa a data do atendimento.
+- O lembrete informa o horário.
+- O lembrete pode apresentar informações relevantes sobre o atendimento.
+- O sistema evita o envio duplicado do mesmo lembrete.
+
+## US14 — Visualizar meus agendamentos
 
 **Como** funcionário do PROCON
 
-**Quero** visualizar os atendimentos agendados
+**Quero** visualizar os atendimentos agendados sob minha responsabilidade
 
-**Para** organizar os atendimentos presenciais.
+**Para** organizar os atendimentos que realizarei.
 
-### Critérios de aceitação:
-
-- O funcionário consegue consultar os agendamentos.
-  
-- Os agendamentos são apresentados por data.
-  
-- É possível visualizar o horário.
-  
+### Critérios de aceitação
+- O funcionário consegue acessar o painel Web.
+- O sistema apresenta os atendimentos associados ao funcionário.
+- Os agendamentos podem ser visualizados por data.
+- É possível visualizar o horário do atendimento.
+- É possível visualizar o consumidor associado.
 - É possível visualizar o status do atendimento.
+- O funcionário não visualiza atendimentos que não estejam sob sua responsabilidade, conforme as regras definidas pelo sistema.
 
-## US14 — Consultar dados do atendimento
+## US15 — Consultar dados do atendimento
 
 **Como** funcionário do PROCON
 
-**Quero** consultar os dados fornecidos pelo consumidor
+**Quero** consultar os dados do consumidor e do agendamento
 
-**Para** preparar o atendimento presencial.
+**Para** me preparar para o atendimento presencial.
 
-### Critérios de aceitação:
-
-- O funcionário consegue consultar os dados necessários.
-
+### Critérios de aceitação
+- O funcionário consegue visualizar os dados necessários do consumidor.
+- O funcionário consegue visualizar a data e o horário do atendimento.
 - O caso associado ao agendamento é identificado.
-
 - Os documentos necessários podem ser consultados.
+- Os dados apresentados respeitam as regras de acesso e proteção de dados.
 
-- Dados sensíveis são protegidos conforme as regras definidas.
+## US16 — Visualizar contexto da conversa
 
-## US15 — Registrar atendimentos para aprendizado
+**Como** funcionário do PROCON
+
+**Quero** visualizar o contexto da conversa realizada pelo consumidor com o chatbot
+
+**Para** compreender o problema antes de iniciar o atendimento presencial.
+
+### Critérios de aceitação
+- O funcionário consegue acessar o contexto associado ao agendamento.
+- As perguntas realizadas pelo chatbot podem ser consultadas.
+- As respostas fornecidas pelo consumidor podem ser consultadas.
+- A categoria selecionada pelo consumidor pode ser visualizada.
+- O fluxo percorrido durante o atendimento pode ser identificado.
+- A orientação fornecida pelo chatbot pode ser consultada.
+- O motivo do encaminhamento para atendimento presencial é apresentado.
+- O acesso ao contexto respeita as regras de segurança e privacidade.
+
+## US17 — Registrar atendimentos
 
 **Como** responsável pelo sistema
 
@@ -400,61 +409,79 @@ Critérios de aceitação:
 
 **Para** analisar os casos e identificar oportunidades de melhoria do chatbot.
 
-### Critérios de aceitação:
-
-- As interações podem ser registradas.
-  
+### Critérios de aceitação
+- As interações realizadas durante o atendimento podem ser registradas.
 - Perguntas e respostas podem ser armazenadas.
-  
-- O fluxo percorrido pode ser identificado.
-  
+- O fluxo percorrido pelo consumidor pode ser identificado.
 - O resultado do atendimento pode ser registrado.
-  
+- É possível identificar se o caso foi solucionado ou encaminhado.
 - O registro respeita as regras de proteção de dados.
 
-## US16 — Analisar casos para aprimoramento
+## US18 — Analisar casos para aprimoramento
 
 **Como** responsável pelo sistema
 
 **Quero** analisar os atendimentos realizados
 
-**Para** identificar novos padrões, dúvidas e situações que não estavam contempladas na base.
+**Para** identificar novos padrões, dúvidas e situações que não estavam contempladas na base de conhecimento.
 
-### Critérios de aceitação:
-
+### Critérios de aceitação
 - Os atendimentos podem ser consultados para análise.
-
 - É possível identificar casos semelhantes.
-
-- É possível identificar perguntas que não foram solucionadas.
-
-- É possível identificar casos que exigiram atendimento presencial.
-
+- É possível identificar dúvidas que não foram solucionadas.
+- É possível identificar casos que resultaram em atendimento presencial.
 - Casos relevantes podem ser selecionados para avaliação.
+- Os dados utilizados na análise respeitam as regras de privacidade definidas pelo projeto.
 
-## US17 — Incorporar novos conhecimentos à base
+## US19 — Selecionar casos relevantes
 
-**Como** responsável pelo sistema
+**Como** responsável pela base de conhecimento
 
-**Quero** incorporar novos conhecimentos validados à base
+**Quero** selecionar atendimentos relevantes para avaliação
 
-**Para** melhorar a capacidade do chatbot de solucionar problemas futuros.
+**Para** identificar conhecimentos que possam melhorar os atendimentos futuros.
 
-### Critérios de aceitação:
+### Critérios de aceitação
+- Existem critérios definidos para identificar casos relevantes.
+- Casos não solucionados podem ser identificados.
+- Casos recorrentes podem ser identificados.
+- Casos fora dos fluxos existentes podem ser identificados.
+- Casos selecionados ficam disponíveis para avaliação.
+- A seleção não incorpora automaticamente o conhecimento à base.
 
-- Um caso pode ser selecionado para incorporação.
-  
-- O conteúdo passa por validação antes de ser utilizado.
-  
-- O novo conhecimento pode ser associado a uma categoria.
-  
-- O novo conhecimento pode ser associado a um fluxo.
-  
-- É possível identificar a origem do conhecimento incorporado.
-  
+## US20 — Validar novos conhecimentos
+
+**Como** responsável pela base de conhecimento
+
+**Quero** validar novos conhecimentos antes de incorporá-los ao chatbot
+
+**Para** garantir que apenas informações corretas e confiáveis sejam utilizadas nas orientações.
+
+### Critérios de aceitação
+- Um novo conhecimento pode ser submetido para validação.
+- O conhecimento possui uma origem identificável.
+- O conteúdo pode ser aprovado ou rejeitado.
+- Apenas conteúdos aprovados podem ser incorporados à base.
+- O processo de validação fica registrado.
 - Informações não validadas não são utilizadas como orientação oficial.
 
-## US18 — Identificar utilização de IA
+## US21 — Incorporar novos conhecimentos à base
+
+**Como** responsável pela base de conhecimento
+
+**Quero** incorporar conhecimentos validados à base do chatbot
+
+**Para** melhorar a capacidade do sistema de orientar futuros consumidores.
+
+### Critérios de aceitação
+- Um conhecimento validado pode ser incorporado à base.
+- O conhecimento pode ser associado a uma categoria.
+- O conhecimento pode ser associado a um fluxo ou situação.
+- É possível identificar a origem do conhecimento.
+- A atualização fica registrada.
+- O chatbot passa a utilizar apenas a versão validada do conhecimento.
+
+## US22 — Identificar utilização de IA
 
 **Como** consumidor
 
@@ -462,13 +489,26 @@ Critérios de aceitação:
 
 **Para** ter transparência sobre a forma como a resposta foi produzida.
 
-### Critérios de aceitação:
+### Critérios de aceitação
+- O sistema identifica quando recursos de IA foram utilizados.
+- O consumidor é informado conforme as regras definidas pelo projeto.
+- A informação é apresentada de maneira clara.
+- A transparência não prejudica a compreensão da orientação.
 
-- O sistema identifica quando IA foi utilizada.
-  
-- O consumidor é informado conforme a regra definida pelo projeto.
-  
-- A informação não interfere na compreensão da orientação.
+## US23 — Proteger os dados do consumidor
+
+**Como** consumidor
+
+**Quero** que meus dados sejam tratados de forma segura
+
+**Para** proteger minhas informações pessoais durante o atendimento.
+
+### Critérios de aceitação
+- O sistema coleta apenas os dados necessários para o atendimento.
+- O acesso aos dados é controlado conforme o perfil do usuário.
+- Dados pessoais não são utilizados indevidamente.
+- Informações sensíveis possuem proteção adequada.
+- Os registros respeitam as regras de privacidade definidas pelo projeto.
 
 ---
 
