@@ -1,3 +1,5 @@
+// Depois com o backend pronto, a lógica de adicionar mensagens e conversas será feita no backend.
+
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import ConversationContext, { type ConversationMessage, type ConversationSession } from '../context/conversation'
 
@@ -94,3 +96,4 @@ function ConversationProvider({ children }: ConversationProviderProps) {
 }
 
 export default ConversationProvider
+
