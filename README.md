@@ -644,72 +644,61 @@ Uma User Story será considerada Entregue quando:
 
 ## Sprint 3 — Administração, segurança e entrega
 
-| ID      | Requisito | User Story | Tarefa                                                   | Prioridade |
-|---------|-----------|----------- |----------------------------------------------------------|------------|
-| ABP-091 | RF08      | US24	     | Definir layout da interface administrativa	              | Alta       |
-| ABP-092 | RF08	    | US24	     | Criar tela de atendimentos agendados	                    | Alta       |
-| ABP-093 | RF08	    | US24	     | Criar endpoint de consulta de atendimentos	              | Alta       |
-| ABP-094 | RF08	    | US24	     | Implementar listagem de atendimentos	                    | Alta       |
-| ABP-095 | RF08	    | US24	     | Implementar filtros de atendimento	                      | Média      |
-| ABP-096 | RF08	    | US25	     | Criar tela de detalhes do atendimento	                  | Alta       |
-| ABP-097 | RF08      | US25	     | Implementar consulta dos dados do atendimento	          | Alta       |
-| ABP-098 | RF08	    | US26	     | Criar tela de gerenciamento de disponibilidade	          | Alta       |
-| ABP-099 | RF08	    | US26	     | Implementar cadastro de horários	                        | Alta       |
-| ABP-100 | RF08	    | US26	     | Implementar bloqueio de horários	                        | Alta       |
-| ABP-101 | RF08      | US27	     | Criar estados do agendamento	                            | Média      |
-| ABP-102 | RF08	    | US27       | Implementar atualização do status	                      | Média      |
-| ABP-103 | RF05	    | US14	     | Definir arquitetura do módulo de geração textual	        | Alta       |
-| ABP-104 | RP03/RP05 | US14	     | Definir modelo de LLM local permitido	                  | Alta       |
-| ABP-105 | RP05      | US14	     | Configurar modelo local sem API externa	                | Alta       |
-| ABP-106 | RF05	    | US14	     | Implementar geração de explicação textual	              | Alta       |
-| ABP-107 | RF05	    | US15	     | Implementar identificação de respostas com auxílio de IA	| Alta       |
-| ABP-108 | RF05	    | US14	     | Garantir que a IA não altere a orientação do fluxo	      | Alta       |
-| ABP-109 | RF05	    | US15	     | Criar aviso de transparência sobre uso de IA	            | Média      |
-| ABP-110 | RNF03	    | US28	     | Mapear dados pessoais armazenados	                      | Alta       |
-| ABP-111 | RNF03	    | US28	     | Revisar armazenamento de dados do consumidor	            | Alta       |
-| ABP-112 | RNF03     | US24–US28	 | Implementar controle de acesso administrativo	          | Alta       |
-| ABP-113 | RNF03	    | US24–US28	 | Revisar exposição de dados pessoais	                    | Alta       |
-| ABP-114 | RNF03	    | US01–US30	 | Realizar revisão de conformidade com LGPD	              | Alta       |
-| ABP-115 | RNF02	    | US01–US30	 | Realizar testes de desempenho	                          | Alta       |
-| ABP-116 | RNF02     | US01–US30	 | Avaliar disponibilidade do sistema	                      | Média      |
-| ABP-117 | RNF08	    | US01–US30	 | Ampliar cobertura de testes automatizados	              | Alta       |
-| ABP-118 | RNF08	    | US01–US30	 | Criar testes de integração	                              | Alta       |
-| ABP-119 | RNF08	    | US01–US30	 | Criar testes do fluxo completo	                          | Alta       |
-| ABP-120 | RNF08	    | —	         | Configurar pipeline de CI/CD	                            | Média      |
-| ABP-121 | RNF08	    | —	         | Automatizar execução dos testes no CI	                  | Média      |
-| ABP-122 | RNF06     | —	         | Revisar configuração Docker	                            | Alta       |
-| ABP-123 | RNF06	    | —	         | Validar execução completa via Docker	                    | Alta       |
-| ABP-124 | RNF07	    | —	         | Documentar instalação do sistema	                        | Alta       |
-| ABP-125 | RNF07     | —	         | Documentar requisitos de hardware e software	            | Alta       |
-| ABP-126 | RNF07	    | —	         | Documentar arquitetura da aplicação	                    | Alta       |
-| ABP-127 | RNF07	    | —	         | Documentar configuração da API WhatsApp	                | Alta       |
-| ABP-128 | RNF07     | —	         | Documentar configuração da base de conhecimento	        | Média      |
-| ABP-129 | RNF08	    | —	         | Atualizar README do projeto	                            | Alta       |
-| ABP-130 | RNF08	    | —	         | Revisar documentação técnica	                            | Alta       |
-| ABP-131 | RP04	    | —	         | Revisar escopo final do MVP	                            | Alta       |
-| ABP-132 | RNF08     | —	         | Realizar revisão geral do código	                        | Alta       |
-| ABP-133 | RNF08     | —	         | Corrigir bugs encontrados nos testes finais	            | Alta       |
-| ABP-134 | RNF08     | —	         | Realizar teste de aceitação do sistema  	                | Alta       |
-| ABP-135 | RNF08     | —	         | Preparar ambiente para demonstração	                    | Alta       |
-| ABP-136 | RNF08     | —	         | Preparar apresentação da Sprint Review	                  | Alta       |
-| ABP-137 | RNF08     | —	         | Preparar documentação da entrega final	                  | Alta       |
-
----
-
-# 🔗 LINKS
-
-### BACKLOG DO PRODUTO 
-[Clique Aqui]()
-
-
-### Protótipo do aplicativo
-[Clique Aqui]()
-
-### Protótipo chatbot
-[Clique Aqui]()
-
-### Protótipo da IA
-[Clique Aqui]()
+| ID      | Requisito | User Story     | Tarefa                                                                                                       | Prioridade |
+|---------|-----------|----------------|--------------------------------------------------------------------------------------------------------------|------------|
+| ABP-087	| RF08	    | US13	         | Definir arquitetura do painel administrativo	                                                                | Alta       |
+| ABP-088	| RF08	    | US13	         | Definir layout da interface administrativa	                                                                  | Alta       |
+| ABP-089	| RF08	    | US13	         | Criar tela de agendamentos	                                                                                  | Alta       |
+| ABP-090	| RF08	    | US13	         | Criar endpoint de consulta de agendamentos	                                                                  | Alta       |
+| ABP-091	| RF08	    | US13	         | Implementar listagem de agendamentos	                                                                        | Alta       |
+| ABP-092	| RF08	    | US13	         | Implementar visualização por data	                                                                          | Alta       |
+| ABP-093	| RF08	    | US13	         | Implementar filtros de atendimento	                                                                          | Média      |
+| ABP-094	| RF08	    | US14	         | Criar tela de detalhes do atendimento	                                                                      | Alta       |
+| ABP-095	| RF08	    | US14	         | Implementar consulta dos dados do consumidor	                                                                | Alta       |
+| ABP-096	| RF08	    | US14	         | Implementar visualização do contexto da conversa	                                                            | Alta       |
+| ABP-097	| RF08	    | US14	         | Implementar visualização do fluxo percorrido	                                                                | Alta       |
+| ABP-098	| RF08	    | US14	         | Implementar visualização dos documentos necessários  	                                                      | Alta       |
+| ABP-099	| RF08	    | US13	         | Criar estados do agendamento	                                                                                | Média      |
+| ABP-100	| RF08	    | US13	         | Implementar atualização do status do atendimento	                                                            | Média      |
+| ABP-101	| RF12/RP09	| US15	         | Definir estratégia de aprendizado com os atendimentos	                                                      | Alta       |
+| ABP-102	| RF12	    | US15	         | Definir estrutura de dados para registro dos atendimentos                                                    | Alta       |
+| ABP-103	| RF12	    | US16	         | Definir critérios para seleção de casos relevantes	                                                          | Média      |
+| ABP-104	| RF12  	  | US16	         | Implementar identificação de atendimentos não solucionados                                                   | Alta       |
+| ABP-105	| RF12	    | US16	         | Implementar identificação de casos encaminhados ao presencial                                                | Alta       |
+| ABP-106	| RF12	    | US16	         | Implementar consulta de casos para análise	                                                                  | Média      |
+| ABP-107	| RF12/RP09	| US17	         | Definir processo de validação de novos conhecimentos	                                                        | Alta       |
+| ABP-108	| RF12/RP09	| US17	         | Criar status de conhecimento pendente de validação	                                                          | Alta       |
+| ABP-109	| RF12/RP09	| US17	         | Implementar aprovação de novo conhecimento	                                                                  | Média      |
+| ABP-110	| RF12/RP09	| US17	         | Implementar associação do conhecimento à categoria	                                                          | Média      |
+| ABP-111	| RF12/RP09	| US17	         | Implementar rastreabilidade da origem do conhecimento	                                                      | Alta       |
+| ABP-112	| RNF03	    | US02/US13/US14 | Mapear dados pessoais armazenados	                                                                          | Alta       |
+| ABP-113	| RNF03	    | US15	         | Avaliar dados armazenados para aprendizado	                                                                  | Alta       |
+| ABP-114	| RNF03	    | US13/US14	     | Implementar controle de acesso ao painel	                                                                    | Alta       |
+| ABP-115	| RNF03	    | US13/US14	     | Revisar exposição de dados pessoais	                                                                        | Alta       |
+| ABP-116	| RNF03	    | US01–US18	     | Realizar revisão de conformidade com LGPD	                                                                  | Alta       |
+| ABP-117	| RNF05	    | US18	         | Definir quando uma resposta será considerada auxiliada por IA                                                | Média      |
+| ABP-118	| RNF05	    | US18	         | Implementar identificação do uso de IA	                                                                      | Média      |
+| ABP-119	| RNF05	    | US18	         | Implementar aviso de transparência ao consumidor	MédiaABP-122	RNF02	US01–US18	Realizar testes de desempenho	| Alta       |
+| ABP-120	| RNF08	    | US01–US18	     | Ampliar cobertura de testes automatizados	                                                                  | Alta       |
+| ABP-121	| RNF08	    | US01–US18	     | Criar testes de integração	                                                                                  | Alta       |
+| ABP-122	| RNF08	    | US01–US18	     | Criar testes end-to-end do fluxo completo	                                                                  | Alta       |
+| ABP-123	| RNF08	    | —	             | Configurar pipeline de CI/CD	                                                                                | Média      |
+| ABP-124	| RNF08	    | —	             | Automatizar execução dos testes no CI	                                                                      | Média      |
+| ABP-125	| RNF06	    | —	             | Revisar configuração Docker	                                                                                | Alta       |
+| ABP-126	| RNF06	    | —	             | Validar execução completa através do Docker	                                                                | Alta       |
+| ABP-127	| RNF07	    | —	             | Documentar instalação do sistema	                                                                            | Alta       |
+| ABP-128	| RNF07	    | —	             | Documentar requisitos de hardware e software	                                                                | Alta       |
+| ABP-130	| RNF07	    | —	             | Documentar arquitetura da aplicação	                                                                        | Alta       |
+| ABP-131	| RNF07	    | —	             | Documentar configuração da API do WhatsApp	                                                                  | Alta       |
+| ABP-132	| RNF07	    | —	             | Documentar funcionamento da base de conhecimento	                                                            | Alta       |
+| ABP-133	| RNF08	    | —	             | Atualizar README do projeto	                                                                                | Alta       |
+| ABP-134	| RP04	    | —	             | Revisar escopo final do MVP	                                                                                | Alta       |
+| ABP-135	| RNF08	    | —	             | Realizar revisão geral do código	                                                                            | Alta       |
+| ABP-136	| RNF08	    | —	             | Corrigir bugs identificados	                                                                                | Alta       |
+| ABP-137	| RNF08	    | —	             | Realizar teste de aceitação do sistema	                                                                      | Alta       |
+| ABP-138	| RNF08	    | —	             | Preparar ambiente para demonstração	                                                                        | Alta       |
+| ABP-139	| RNF08	    | —	             | Preparar apresentação da Sprint Review	                                                                      | Alta       |
+| ABP-140	| RNF07	    | —	             | Preparar documentação final de entrega	                                                                      | Alta       |
 
 ---
 
