@@ -1,7 +1,12 @@
+import dotenv from "dotenv";
 import express, { type Request, type Response } from "express";
+
+dotenv.config({ path: "../.env" });
+
  const app = express();
 
  const PORT = Number(process.env.PORT) || 3001;
+ const NODE_ENV = process.env.NODE_ENV || "development";
 
  app.use(express.json());
 
@@ -18,5 +23,7 @@ import express, { type Request, type Response } from "express";
  });
 
  app.listen(PORT, () => {
-    console.log(`Backend rodando em http://localhost:${PORT}`);
- });
+  console.log(
+    `Backend rodando em http://localhost:${PORT} (${NODE_ENV})`
+  );
+});
