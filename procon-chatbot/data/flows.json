@@ -1,0 +1,194 @@
+{
+  "mensagem_inicial": {
+    "texto": "Olá! Seja bem-vindo ao atendimento virtual do PROCON. 👋\n\nEstou aqui para oferecer uma orientação inicial sobre o seu caso.\n\nEm que posso ajudar?"
+  },
+
+  "aviso": {
+    "texto": "⚠️ Este atendimento é apenas uma orientação inicial e não substitui a análise de um atendente do PROCON."
+  },
+
+  "categorias": {
+
+    "produto_defeito": {
+      "nome": "Problema com produto",
+      "pergunta_inicial": "defeito_1",
+
+      "perguntas": {
+
+        "defeito_1": {
+          "texto": "Entendi. Vamos tentar compreender melhor o que aconteceu. O produto que você comprou apresentou algum defeito ou problema?",
+          "opcoes": {
+            "1": {
+              "texto": "Sim",
+              "proximo": "defeito_2"
+            },
+            "2": {
+              "texto": "Não",
+              "proximo": "final_sem_problema"
+            }
+          }
+        },
+
+        "defeito_2": {
+          "texto": "Certo. Para continuarmos, você possui algum comprovante da compra, como nota fiscal, recibo ou outro documento relacionado à aquisição?",
+          "opcoes": {
+            "1": {
+              "texto": "Sim",
+              "proximo": "final_comprovante"
+            },
+            "2": {
+              "texto": "Não",
+              "proximo": "final_sem_comprovante"
+            }
+          }
+        }
+      },
+
+      "resultados": {
+
+        "final_sem_problema": {
+          "mensagem": "Entendi. Como você informou que o produto não apresenta defeito ou problema, não há necessidade de seguir por este fluxo.\n\nSe você tiver outra dúvida relacionada a uma compra ou serviço, poderá iniciar um novo atendimento.\n\nEste é um exemplo de fluxo. As orientações definitivas serão baseadas nas informações oficiais fornecidas pelo PROCON."
+        },
+
+        "final_comprovante": {
+          "mensagem": "Entendi. Você informou que o produto apresentou um problema e possui um comprovante da compra.\n\nPara este protótipo, vamos considerar que essas informações são suficientes para concluir esta etapa do atendimento.\n\nAs orientações definitivas serão baseadas na legislação e nas informações oficiais disponibilizadas pelo PROCON."
+        },
+
+        "final_sem_comprovante": {
+          "mensagem": "Entendi. Você informou que o produto apresentou um problema, mas não possui um comprovante da compra.\n\nNeste caso, pode ser necessário analisar a situação com mais informações. Assim que possível, o atendimento poderá ser encaminhado para um atendente do PROCON, que poderá avaliar o caso com mais detalhes.\n\n⚠️ Este atendimento virtual fornece apenas uma orientação inicial e não substitui a análise de um atendente do PROCON."
+        }
+      }
+    },
+
+    "produto_nao_entregue": {
+      "nome": "Produto não entregue",
+      "pergunta_inicial": "entrega_1",
+
+      "perguntas": {
+
+        "entrega_1": {
+          "texto": "Entendi. Você realizou uma compra, mas o produto ainda não foi entregue?",
+          "opcoes": {
+            "1": {
+              "texto": "Sim",
+              "proximo": "entrega_2"
+            },
+            "2": {
+              "texto": "Não",
+              "proximo": "final_entrega_resolvida"
+            }
+          }
+        },
+
+        "entrega_2": {
+          "texto": "O prazo de entrega informado no momento da compra já terminou?",
+          "opcoes": {
+            "1": {
+              "texto": "Sim",
+              "proximo": "final_prazo_vencido"
+            },
+            "2": {
+              "texto": "Não",
+              "proximo": "final_prazo_nao_vencido"
+            }
+          }
+        }
+      },
+
+      "resultados": {
+
+        "final_entrega_resolvida": {
+          "mensagem": "Entendi. Como você informou que não há um problema de entrega neste momento, vamos encerrar este fluxo.\n\nSe precisar de ajuda com outro assunto, poderá iniciar um novo atendimento.\n\nEste é um exemplo de fluxo e as orientações definitivas serão baseadas nas informações oficiais do PROCON."
+        },
+
+        "final_prazo_vencido": {
+          "mensagem": "Entendi. Você informou que o produto ainda não foi entregue e que o prazo informado já terminou.\n\nEste caso pode precisar de uma análise mais detalhada. Assim que possível, o atendimento poderá ser encaminhado para um atendente do PROCON.\n\n⚠️ Este atendimento virtual fornece apenas uma orientação inicial e não substitui a análise de um atendente do PROCON."
+        },
+
+        "final_prazo_nao_vencido": {
+          "mensagem": "Entendi. Como o prazo de entrega informado ainda não terminou, vamos considerar que o pedido permanece dentro do prazo neste exemplo.\n\nCaso a situação mude ou o prazo termine sem que o produto seja entregue, você poderá buscar uma nova orientação.\n\nEste é um exemplo de fluxo e as orientações definitivas serão baseadas nas informações oficiais do PROCON."
+        }
+      }
+    },
+
+    "cobranca_indevida": {
+      "nome": "Cobrança que você não reconhece",
+      "pergunta_inicial": "cobranca_1",
+
+      "perguntas": {
+
+        "cobranca_1": {
+          "texto": "Entendi. Você recebeu uma cobrança que não reconhece ou acredita que não deveria ter sido realizada?",
+          "opcoes": {
+            "1": {
+              "texto": "Sim",
+              "proximo": "final_nao_reconhece"
+            },
+            "2": {
+              "texto": "Não",
+              "proximo": "final_reconhece"
+            }
+          }
+        }
+      },
+
+      "resultados": {
+
+        "final_nao_reconhece": {
+          "mensagem": "Entendi. Você informou que não reconhece a cobrança.\n\nComo este caso pode exigir uma análise mais detalhada das informações da cobrança, assim que possível o atendimento poderá ser encaminhado para um atendente do PROCON.\n\n⚠️ Este atendimento virtual fornece apenas uma orientação inicial e não substitui a análise de um atendente do PROCON."
+        },
+
+        "final_reconhece": {
+          "mensagem": "Entendi. Como você informou que reconhece a cobrança, este fluxo específico não identifica uma cobrança não reconhecida.\n\nSe houver outro problema relacionado à cobrança, você poderá iniciar um novo atendimento.\n\nEste é um exemplo de fluxo e as orientações definitivas serão baseadas nas informações oficiais do PROCON."
+        }
+      }
+    },
+
+    "fora_do_escopo": {
+      "nome": "Outro assunto",
+      "pergunta_inicial": "fora_escopo_1",
+
+      "perguntas": {
+
+        "fora_escopo_1": {
+          "texto": "Entendi. No momento, este atendimento virtual possui fluxos específicos para alguns tipos de situações de consumo. O assunto que você deseja tratar está relacionado a um produto, serviço, compra ou cobrança?",
+          "opcoes": {
+            "1": {
+              "texto": "Sim",
+              "proximo": "fora_escopo_2"
+            },
+            "2": {
+              "texto": "Não",
+              "proximo": "final_fora_escopo"
+            }
+          }
+        },
+
+        "fora_escopo_2": {
+          "texto": "Certo. Ainda não temos informações suficientes para analisar esse tipo de situação por este atendimento virtual. Você poderá aguardar um encaminhamento para um atendente do PROCON, que poderá analisar o seu caso com mais detalhes.",
+          "opcoes": {
+            "1": {
+              "texto": "Continuar",
+              "proximo": "final_encaminhamento"
+            },
+            "2": {
+              "texto": "Encerrar atendimento",
+              "proximo": "final_fora_escopo"
+            }
+          }
+        }
+      },
+
+      "resultados": {
+
+        "final_fora_escopo": {
+          "mensagem": "Entendi. Este atendimento virtual não possui, neste momento, um fluxo adequado para a situação informada.\n\nAssim que possível, o atendimento poderá ser encaminhado para um atendente do PROCON, que poderá analisar o caso com mais detalhes.\n\n⚠️ Este atendimento virtual fornece apenas uma orientação inicial e não substitui a análise de um atendente do PROCON."
+        },
+
+        "final_encaminhamento": {
+          "mensagem": "Certo. Seu caso foi identificado como uma situação que pode precisar de uma análise mais detalhada.\n\nAssim que possível, o atendimento poderá ser encaminhado para um atendente do PROCON.\n\nObrigado por utilizar o atendimento virtual do PROCON."
+        }
+      }
+    }
+  }
+}
