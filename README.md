@@ -635,23 +635,23 @@ Uma User Story será considerada Entregue quando:
 | ABP-009	| RNF08	    | —	         | Configurar integração contínua inicial	                   | Média      |
 | ABP-010	| RP02	    | —	         | Criar estrutura inicial do backend	                       | Alta       |
 | ABP-011	| RP02	    | —	         | Configurar variáveis de ambiente	                         | Alta       |
-| ABP-012	| RP02	    | —	         | Configurar conexão com banco de dados SQL	               | Alta       |
-| ABP-013	| RP01	    | US01	     | Definir estratégia de integração com a API do WhatsApp	   | Alta       |
-| ABP-014	| RP01	    | US01	     | Configurar ambiente de testes da API do WhatsApp	         | Alta       |
-| ABP-015	| RP01	    | US01	     | Implementar recebimento de mensagens	                     | Alta       |
-| ABP-016	| RP01	    | US01	     | Implementar envio de mensagens	                           | Alta       |
+| ABP-012	| RP08	    | US013      | Implementar filtros de atendimento	                       | Alta       |
+| ABP-013	| RP08	    | US013	     | Definir arquitetura do painel administrativo	             | Alta       |
+| ABP-014	| RP08	    | US013	     | Definir layout da interface administrativa                | Alta       |
+| ABP-015	| RP08	    | US013	     | Criar tela de agendamentos                                | Alta       |
+| ABP-016	| RP08	    | US013	     | Implementar visualização por data	                       | Alta       |
 | ABP-017	| RP01	    | US01	     | Implementar tratamento de mensagens recebidas	           | Alta       |
 | ABP-018	| RF01	    | US01	     | Criar mensagem inicial do chatbot	                       | Alta       |
 | ABP-019	| RNF04	    | US01	     | Implementar aviso de caráter orientativo	                 | Alta       |
-| ABP-020	| RF02	    | US02	     | Criar modelo de consumidor	                               | Alta       |
+| ABP-020	| RF08	    | US10	     | Criar modelo de disponibilidade	                         | Alta       |
 | ABP-021	| RF02	    | US02	     | Criar modelo de sessão	                                   | Alta       |
 | ABP-022	| RF02	    | US02	     | Implementar criação de sessão	                           | Alta       |
-| ABP-023	| RF02	    | US02	     | Implementar recuperação de sessão	                       | Alta       |
-| ABP-024	| RF02	    | US02	     | Associar mensagens à sessão	                             | Alta       |
+| ABP-023	| RF08	    | US10	     | Implementar cadastro de datas disponíveis	               | Alta       |
+| ABP-024	| RF08	    | US10	     | Implementar cadastro de horários disponíveis	             | Alta       |
 | ABP-025	| RF03	    | US03	     | Definir categorias iniciais de problemas	                 | Alta       |
 | ABP-026	| RF03	    | US03	     | Criar estrutura de categorias	                           | Alta       |
 | ABP-027	| RF03	    | US03	     | Implementar consulta de categorias	                       | Alta       |
-| ABP-028	| RF03	    | US03	     | Implementar apresentação das categorias no WhatsApp	     | Alta       |
+| ABP-028	| RF07	    | US11	     | Criar modelo de agendamento	                             | Alta       |
 | ABP-029	| RF04	    | US04	     | Definir estrutura dos fluxos decisórios	                 | Alta       |
 | ABP-030	| RF04	    | US04	     | Criar modelo de perguntas	                               | Alta       |
 | ABP-031	| RF04	    | US04	     | Criar modelo de alternativas	                             | Alta       |
@@ -659,13 +659,13 @@ Uma User Story será considerada Entregue quando:
 | ABP-033	| RF04	    | US04	     | Implementar controle de estado do fluxo	                 | Alta       |
 | ABP-034	| RF04	    | US05	     | Implementar perguntas condicionais	                       | Alta       |
 | ABP-035	| RF04	    | US05	     | Implementar seleção da próxima pergunta	                 | Alta       |
-| ABP-036	| RF09/RP07	| US07	     | Analisar documento de Dúvidas Frequentes	                 | Alta       |
-| ABP-037	| RF09/RP07	| US07	     | Identificar categorias existentes na documentação	       | Alta       |
-| ABP-038	| RF09/RP07	| US07	     | Estruturar perguntas e respostas da documentação	         | Alta       |
-| ABP-039	| RF09/RP07	| US07	     | Estruturar informações sobre documentos necessários	     | Alta       |
-| ABP-040	| RF09	    | US07	     | Criar estrutura da base de conhecimento	                 | Alta       |
-| ABP-041	| RF09	    | US07	     | Inserir conteúdo inicial na base	                         | Alta       |
-| ABP-042	| RF09	    | US07	     | Validar conteúdo importado	                               | Alta       |
+| ABP-036	| RF07	    | US11	     | Implementar registro do agendamento	                     | Alta       |
+| ABP-037	| RP07	    | US11	     | Implementar prevenção de conflitos de horário	           | Alta       |
+| ABP-038	| RP07	    | US11	     | Implementar encerramento da sessão após o agendamento	   | Alta       |
+| ABP-039	| RP07	    | US13	     | Implementar listagem de agendamentos	                     | Alta       |
+| ABP-040	| RF08	    | US14	     | Criar tela de detalhes do atendimento	                   | Alta       |
+| ABP-041	| RF08	    | US14	     | Implementar consulta dos dados do consumidor	             | Alta       |
+| ABP-042	| RF08	    | US14 	     | Criar estados do agendamento	                             | Alta       |
 | ABP-043	| RF01–RF04	| US01–US05	 | Integrar WhatsApp, chatbot e fluxos decisórios	           | Alta       |
 | ABP-044	| RNF01	    | US01–US07	 | Revisar linguagem das mensagens	                         | Alta       |
 | ABP-045	| RNF08	    | US01–US05	 | Criar testes do fluxo inicial	                           | Alta       |
@@ -691,18 +691,18 @@ Uma User Story será considerada Entregue quando:
 | ABP-058	| RF11	    | US12	     | Criar modelo de documentos necessários	                            | Alta       |
 | ABP-059	| RF11	    | US12	     | Associar documentos aos tipos de atendimento	                      | Alta       |
 | ABP-060	| RF11	    | US12	     | Implementar apresentação de documentos pelo WhatsApp	              | Alta       |
-| ABP-061	| RF08	    | US10	     | Criar modelo de disponibilidade	                                  | Alta       |
-| ABP-062	| RF08	    | US10	     | Implementar cadastro de datas disponíveis	                        | Alta       |
-| ABP-063	| RF08	    | US10	     | Implementar cadastro de horários disponíveis	                      | Alta       |
+| ABP-061	| RP02	    | -	         | Configurar conexão do backend com o banco de dados SQL	            | Alta       |
+| ABP-062	| RP01	    | US01	     | Definir estratégia de integração com a API do WhatsApp	            | Alta       |
+| ABP-063	| RP01	    | US01	     | Configurar ambiente de testes da API do WhatsApp	                  | Alta       |
 | ABP-064	| RF08	    | US10	     | Implementar consulta de disponibilidade	                          | Alta       |
 | ABP-065	| RF07	    | US10	     | Implementar seleção de data pelo WhatsApp	                        | Alta       |
 | ABP-066	| RF07	    | US10	     | Implementar seleção de horário pelo WhatsApp	                      | Alta       |
-| ABP-067	| RF07	    | US11	     | Criar modelo de agendamento	                                      | Alta       |
-| ABP-068	| RF07	    | US11	     | Implementar registro do agendamento	                              | Alta       |
+| ABP-067	| RP01	    | US01	     | Implementar recebimento de mensagens	                              | Alta       |
+| ABP-068	| RP01	    | US01	     | Implementar envio de mensagens	                                    | Alta       |
 | ABP-069	| RF07	    | US11	     | Implementar validação da disponibilidade	                          | Alta       |
-| ABP-070	| RF07	    | US11	     | Implementar prevenção de conflitos de horário	                    | Alta       |
+| ABP-070	| RF02	    | US02  	   | Criar modelo de consumidor	                                        | Alta       |
 | ABP-071	| RF07	    | US11	     | Implementar confirmação do agendamento pelo WhatsApp	              | Alta       |
-| ABP-072	| RF07	    | US11	     | Implementar encerramento da sessão após o agendamento	            | Alta       |
+| ABP-072	| RF02	    | US02	     | Implementar recuperação de sessão	                                | Alta       |
 | ABP-073	| RF07	    | US11	     | Definir estratégia de lembrete do atendimento	                    | Média      |
 | ABP-074	| RF07	    | US11	     | Implementar envio de lembrete próximo ao atendimento	              | Média      |
 | ABP-075	| RF06	    | US15	     | Definir estrutura de registro das interações	                      | Alta       |
@@ -724,19 +724,19 @@ Uma User Story será considerada Entregue quando:
 
 | ID      | Requisito | User Story     | Tarefa                                                                                                       | Prioridade |
 |---------|-----------|----------------|--------------------------------------------------------------------------------------------------------------|------------|
-| ABP-087	| RF08	    | US13	         | Definir arquitetura do painel administrativo	                                                                | Alta       |
-| ABP-088	| RF08	    | US13	         | Definir layout da interface administrativa	                                                                  | Alta       |
-| ABP-089	| RF08	    | US13	         | Criar tela de agendamentos	                                                                                  | Alta       |
+| ABP-087	| RF02	    | US02	         | Associar mensagens à sessão	                                                                                | Alta       |
+| ABP-088	| RF03	    | US03	         | Implementar apresentação de categorias no WhatsApp	                                                          | Alta       |
+| ABP-089	| RF09/RP07	| US07	         | Analisar documento de Dúvidas Frequentes	                                                                    | Alta       |
 | ABP-090	| RF08	    | US13	         | Criar endpoint de consulta de agendamentos	                                                                  | Alta       |
-| ABP-091	| RF08	    | US13	         | Implementar listagem de agendamentos	                                                                        | Alta       |
-| ABP-092	| RF08	    | US13	         | Implementar visualização por data	                                                                          | Alta       |
-| ABP-093	| RF08	    | US13	         | Implementar filtros de atendimento	                                                                          | Média      |
-| ABP-094	| RF08	    | US14	         | Criar tela de detalhes do atendimento	                                                                      | Alta       |
-| ABP-095	| RF08	    | US14	         | Implementar consulta dos dados do consumidor	                                                                | Alta       |
+| ABP-091	| RF09/RP07	| US07  	       | Identificar categorias existentes na documentação                                                            | Alta       |
+| ABP-092	| RF09/RP07 | US07	         | Estruturar perguntas e respostas da documentação	                                                            | Alta       |
+| ABP-093	| RF09/RP07	| US07	         | Estruturar informações sobre documentos necessários	                                                        | Média      |
+| ABP-094	| RF09	    | US07	         | Criar estrutura da base de conhecimento	                                                                    | Alta       |
+| ABP-095	| RF09	    | US07  	       | Inserir conteúdo inicial na base	                                                                            | Alta       |
 | ABP-096	| RF08	    | US14	         | Implementar visualização do contexto da conversa	                                                            | Alta       |
 | ABP-097	| RF08	    | US14	         | Implementar visualização do fluxo percorrido	                                                                | Alta       |
 | ABP-098	| RF08	    | US14	         | Implementar visualização dos documentos necessários  	                                                      | Alta       |
-| ABP-099	| RF08	    | US13	         | Criar estados do agendamento	                                                                                | Média      |
+| ABP-099	| RF09	    | US07  	       | Validar conteúdo inicial na base	                                                                            | Média      |
 | ABP-100	| RF08	    | US13	         | Implementar atualização do status do atendimento	                                                            | Média      |
 | ABP-101	| RF12/RP09	| US15	         | Definir estratégia de aprendizado com os atendimentos	                                                      | Alta       |
 | ABP-102	| RF12	    | US15	         | Definir estrutura de dados para registro dos atendimentos                                                    | Alta       |
