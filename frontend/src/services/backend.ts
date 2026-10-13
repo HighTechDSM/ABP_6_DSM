@@ -173,6 +173,35 @@ export const backend = {
         throw error
       }
     }
+  },
+
+  liberacao: {
+    // Gerar código de 6 dígitos (chamado ao final do fluxo do chat, futuramente)
+    gerar: async (sessionId: string) => {
+      try {
+        return await fetchWithError(`${API_URL}/appointments/gerar-codigo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId })
+        })
+      } catch (error) {
+        console.error('❌ Erro ao gerar código de liberação:', error)
+        throw error
+      }
+    },
+
+    // Validar código de 6 dígitos (chamado pelo Home.tsx)
+    validar: async (codigo: string) => {
+      try {
+        return await fetchWithError(`${API_URL}/appointments/validar-codigo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo })
+        })
+      } catch (error) {
+        console.error('❌ Erro ao validar código de liberação:', error)
+        throw error
+      }
+    }
   }
 }
-

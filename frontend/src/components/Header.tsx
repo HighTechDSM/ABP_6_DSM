@@ -86,6 +86,10 @@ function Header() {
       )
     }
 
+    // Limpa os dados do agendamento anterior desta sessão
+    sessionStorage.removeItem('agendamentoRealizado')
+    sessionStorage.removeItem('agendamentoConcluido')
+
     navigate('/inicio', { replace: true })
   }
 

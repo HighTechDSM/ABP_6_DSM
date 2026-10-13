@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import Icon from '../components/Icon'
+import { backend } from '../services/backend'
 
 function Home() {
   const location = useLocation()
@@ -43,7 +44,7 @@ function Home() {
     navigate('/agendamentos', { replace: true })
   }
 
-  function liberarAgendamento() {
+  async function liberarAgendamento() {
     if (!/^\d{6}$/.test(codigo)) {
       setErroCodigo(
         'Digite o código de liberação com 6 dígitos.'
@@ -51,17 +52,23 @@ function Home() {
       return
     }
 
-    sessionStorage.setItem(
-      'agendamentoLiberado',
-      'true'
-    )
+    try {
+      await backend.liberacao.validar(codigo)
 
-    window.dispatchEvent(
-      new Event('agendamentoLiberado')
-    )
+      sessionStorage.setItem(
+        'agendamentoLiberado',
+        'true'
+      )
 
-    setErroCodigo('')
-    setShowSuccessModal(true)
+      window.dispatchEvent(
+        new Event('agendamentoLiberado')
+      )
+
+      setErroCodigo('')
+      setShowSuccessModal(true)
+    } catch (e) {
+      setErroCodigo((e as Error).message)
+    }
   }
 
   return (

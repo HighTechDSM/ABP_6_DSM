@@ -1,26 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import EmptyState from '../components/EmptyState'
 import MonthCalendar from '../components/MonthCalendar'
 import PageHeader from '../components/PageHeader'
+import { backend } from '../services/backend'
 
 type Agendamento = {
-  id: number
+  id: string
   name: string
   birthDate: string
   cpf: string
   date: string
   time: string
+  status?: string
+  criadoEm?: string
 }
-
-const DIAS_DISPONIVEIS = [
-  '2026-09-14',
-  '2026-09-15',
-  '2026-09-16',
-  '2026-09-17',
-  '2026-09-18',
-  '2026-09-21',
-  '2026-09-22',
-]
 
 const gerarHorarios = (inicio: number, fim: number) => {
   const horarios: string[] = []
@@ -46,6 +39,9 @@ function Disponibilidade() {
   const [cpf, setCpf] = useState('')
 
   const [selectedDate, setSelectedDate] = useState('')
+
+  // Dias disponíveis vindos do backend
+  const [diasDisponiveis, setDiasDisponiveis] = useState<string[]>([])
 
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>(() => {
     const agendamentoSalvo =
@@ -89,6 +85,18 @@ function Disponibilidade() {
       }
     })
 
+  // Busca os dias disponíveis no backend ao montar o componente
+  useEffect(() => {
+    backend.availability
+      .list()
+      .then((dias: { data: string }[]) => {
+        setDiasDisponiveis(dias.map((d) => d.data))
+      })
+      .catch((e) => {
+        console.error('Erro ao buscar disponibilidade:', e)
+      })
+  }, [])
+
   const pessoaIdentificada =
     name.trim() !== '' &&
     birthDate !== '' &&
@@ -101,7 +109,7 @@ function Disponibilidade() {
     )
     .map((agendamento) => agendamento.time)
 
-  const selecionarHorario = (time: string) => {
+  const selecionarHorario = async (time: string) => {
     if (!selectedDate || !pessoaIdentificada) return
 
     // Impede que o usuário faça mais de um agendamento
@@ -120,50 +128,58 @@ function Disponibilidade() {
 
     if (jaAgendado) return
 
-    const novoAgendamento: Agendamento = {
-      id: Date.now(),
-      name: name.trim(),
-      birthDate,
-      cpf,
-      date: selectedDate,
-      time,
+    try {
+      const novoAgendamento = await backend.appointments.create({
+        name: name.trim(),
+        birthDate,
+        cpf,
+        date: selectedDate,
+        time,
+      })
+
+      // Salva o agendamento
+      sessionStorage.setItem(
+        'agendamentoRealizado',
+        JSON.stringify(novoAgendamento),
+      )
+
+      // Marca que o agendamento foi realmente concluído
+      sessionStorage.setItem(
+        'agendamentoConcluido',
+        'true',
+      )
+
+      setAgendamentos([novoAgendamento])
+      setAgendamentoConcluido(novoAgendamento)
+      setShowSuccessModal(true)
+    } catch (e) {
+      alert((e as Error).message)
     }
-
-    // Salva o agendamento
-    sessionStorage.setItem(
-      'agendamentoRealizado',
-      JSON.stringify(novoAgendamento),
-    )
-
-    // Marca que o agendamento foi realmente concluído
-    sessionStorage.setItem(
-      'agendamentoConcluido',
-      'true',
-    )
-
-    setAgendamentos([novoAgendamento])
-
-    setAgendamentoConcluido(novoAgendamento)
-    setShowSuccessModal(true)
   }
 
-  const cancelarAgendamento = (id: number) => {
-    setAgendamentos((current) =>
-      current.filter(
-        (agendamento) =>
-          agendamento.id !== id,
-      ),
-    )
+  const cancelarAgendamento = async (id: string) => {
+    try {
+      await backend.appointments.delete(id)
 
-    sessionStorage.removeItem(
-      'agendamentoRealizado',
-    )
+      setAgendamentos((current) =>
+        current.filter(
+          (agendamento) =>
+            agendamento.id !== id,
+        ),
+      )
 
-    sessionStorage.removeItem(
-      'agendamentoConcluido',
-    )
+      sessionStorage.removeItem(
+        'agendamentoRealizado',
+      )
 
-    setAgendamentoConcluido(null)
+      sessionStorage.removeItem(
+        'agendamentoConcluido',
+      )
+
+      setAgendamentoConcluido(null)
+    } catch (e) {
+      alert((e as Error).message)
+    }
   }
 
   const formatarData = (date: string) => {
@@ -292,7 +308,7 @@ function Disponibilidade() {
           selectionMode="single"
           selectedDate={selectedDate}
           bookedDates={[]}
-          availableDates={DIAS_DISPONIVEIS}
+          availableDates={diasDisponiveis}
           onDateChange={(date) => {
             setSelectedDate(date)
           }}

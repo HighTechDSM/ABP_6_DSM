@@ -1,29 +1,30 @@
-import dotenv from "dotenv";
-import express, { type Request, type Response } from "express";
+import express from 'express'
+import cors from 'cors'
+import { env } from './config/env'
+import { store } from './data/store'
+import { appointmentsRouter } from './routes/appointments'
+import { availabilityRouter } from './routes/availability'
 
-dotenv.config({ path: "../.env" });
+const app = express()
 
- const app = express();
+app.use(cors({ origin: env.CORS_ORIGIN }))
+app.use(express.json())
 
- const PORT = Number(process.env.PORT) || 3001;
- const NODE_ENV = process.env.NODE_ENV || "development";
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok' })
+})
 
- app.use(express.json());
+app.use('/api/appointments', appointmentsRouter)
+app.use('/api/availability', availabilityRouter)
 
- app.get("/", (_req: Request, res: Response) => {
-    res.json({
-        message: "API Chatbot PROCON funcionando",
-    });
- });
+app.use((_req, res) => {
+  res.status(404).json({ error: 'Rota não encontrada.' })
+})
 
- app.get("/health", (_req: Request, res: Response) => {
-    res.status(200).json({
-        status: "ok",
-    });
- });
+store.init()
 
- app.listen(PORT, () => {
+app.listen(env.PORT, () => {
   console.log(
-    `Backend rodando em http://localhost:${PORT} (${NODE_ENV})`
-  );
-});
+    `Backend rodando em http://localhost:${env.PORT} (${env.NODE_ENV})`,
+  )
+})
