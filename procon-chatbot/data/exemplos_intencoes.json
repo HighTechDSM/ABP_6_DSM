@@ -1,0 +1,163 @@
+
+[
+  {
+    "texto": "Comprei um celular e ele parou de funcionar",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "O produto que comprei veio quebrado",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "Minha televisão apresentou defeito",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "O aparelho não liga desde que chegou",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "Recebi um produto danificado",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "Meu fone de ouvido parou de funcionar",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "A mercadoria veio com problema",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "O produto está com defeito de fabricação",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "Comprei um aparelho e ele não funciona corretamente",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "Quero reclamar de um produto estragado",
+    "intencao": "produto_defeito"
+  },
+  {
+    "texto": "Minha encomenda ainda não chegou",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "Fiz uma compra e não recebi o produto",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "O prazo passou e minha entrega não chegou",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "A loja não entregou meu pedido",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "Meu pedido está atrasado",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "Comprei pela internet e não recebi nada",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "A transportadora ainda não entregou minha compra",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "Onde está meu pedido? Ele não chegou",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "A loja não cumpriu o prazo de entrega",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "Paguei pelo produto, mas não recebi",
+    "intencao": "produto_nao_entregue"
+  },
+  {
+    "texto": "Recebi uma cobrança que não reconheço",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Estão cobrando algo que não comprei",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Apareceu uma cobrança estranha na minha fatura",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Estão descontando um valor da minha conta sem autorização",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Não reconheço essa cobrança do cartão",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Minha fatura veio com um valor que não deveria estar lá",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Estão me cobrando por um serviço que não contratei",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Quero contestar uma cobrança",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Paguei essa conta, mas estão cobrando novamente",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Existe uma cobrança indevida no meu boleto",
+    "intencao": "cobranca_indevida"
+  },
+  {
+    "texto": "Quero saber sobre um assunto diferente",
+    "intencao": "fora_do_escopo"
+  },
+  {
+    "texto": "Preciso de ajuda com outro tema",
+    "intencao": "fora_do_escopo"
+  },
+  {
+    "texto": "Quero conversar sobre um assunto que não está nas opções",
+    "intencao": "fora_do_escopo"
+  },
+  {
+    "texto": "Minha dúvida não tem relação com esses assuntos",
+    "intencao": "fora_do_escopo"
+  },
+  {
+    "texto": "Gostaria de falar sobre outra coisa",
+    "intencao": "fora_do_escopo"
+  },
+  {
+    "texto": "Nenhuma dessas categorias corresponde ao meu caso",
+    "intencao": "fora_do_escopo"
+  },
+  {
+    "texto": "Tenho uma dúvida diferente das apresentadas",
+    "intencao": "fora_do_escopo"
+  },
+  {
+    "texto": "Meu problema não aparece nessa lista",
+    "intencao": "fora_do_escopo"
+  },
+  {
+    "texto": "Quero tratar de outro tipo de situação",
+    "intencao": "fora_do_escopo"
+  },
+  {
+    "texto": "Não encontrei uma opção para minha dúvida",
+    "intencao": "fora_do_escopo"
+  }
+]
