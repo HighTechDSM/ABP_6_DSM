@@ -25,9 +25,55 @@ FORA_ESCOPO = (
 )
 
 
+def problema_nao_entrega(pergunta: str) -> bool:
+    """Detecta ausência de entrega sem confundir com produto recebido danificado."""
+    texto = normalizar(pergunta)
+    padroes = (
+        r'\b(?:nao|nunca)\s+(?:foi\s+)?(?:entregue|recebido|chegou)\b',
+        r'\b(?:nao|nunca)\s+(?:recebi|chegou)\b',
+        r'\b(?:ainda|ate agora)\s+nao\s+(?:recebi|chegou|foi entregue)\b',
+        r'\b(?:pedido|produto|compra|encomenda|mercadoria)\s+(?:nao chegou|nao foi entregue|sumiu|extraviad[ao])\b',
+        r'\b(?:atraso|atrasou|atrasada|atrasado|prazo de entrega vencido)\b',
+        r'\b(?:transportadora|correios)\s+(?:perdeu|extraviou|nao entregou)\b',
+    )
+    return any(re.search(padrao, texto) for padrao in padroes)
+
+
+def cobranca_duplicada(pergunta: str) -> bool:
+    """Reconhece cobrança repetida da mesma compra, não qualquer cobrança."""
+    texto = normalizar(pergunta)
+    repeticao = bool(re.search(
+        r'\b(duas vezes|2 vezes|duplicad[ao]|em dobro|duas cobrancas|'
+        r'cobraram duas|cobrou duas|repetid[ao]|mesma compra duas)\b', texto
+    ))
+    contexto = bool(re.search(
+        r'\b(cobranca|cobrou|cobraram|cartao|fatura|debito|pagamento|'
+        r'compra|valor|descontaram)\b', texto
+    ))
+    return repeticao and contexto
+
+
+def seguro_nao_contratado(pergunta: str) -> bool:
+    """Identifica cobrança de seguro não contratado, sem confundir com garantia."""
+    texto = normalizar(pergunta)
+    seguro = bool(re.search(r'\bseguros?\b', texto))
+    nao_contratado = bool(re.search(
+        r'\b(?:nao|nunca)\s+(?:contratei|contratado|contratada|autorizei|solicitei|reconheco)\b'
+        r'|\b(?:sem minha autorizacao|sem meu consentimento)\b', texto
+    ))
+    cobranca = bool(re.search(
+        r'\b(?:cobranca|cobrou|cobraram|cartao|fatura|desconto|descontando|debito)\b', texto
+    ))
+    return seguro and nao_contratado and cobranca
+
+
 def caso_incompativel(pergunta: str, faq: dict) -> bool:
     """Bloqueia incompatibilidades explícitas; não substitui validação jurídica."""
     texto = normalizar(pergunta)
+    if cobranca_duplicada(pergunta) and faq.get('id') != 'FAQ-050':
+        return True
+    if problema_nao_entrega(pergunta) and faq.get('id') != 'FAQ-015':
+        return True
     if faq.get('id') == 'FAQ-048':
         # FAQ-048 é sobre produto RECEBIDO danificado, não defeito posterior.
         defeito_posterior = bool(re.search(
@@ -174,6 +220,68 @@ class BuscaConhecimento:
                 'mensagem': 'A pergunta não corresponde a uma orientação disponível na base do PROCON.',
                 'similaridade': 0.0,
             }
+        # Seguro cobrado sem contratação: correspondência específica com a FAQ-001.
+        # Não depende da seleção do Qwen quando os sinais são explícitos.
+        if seguro_nao_contratado(texto):
+            faq = next((item for item in self.base if item.get('id') == 'FAQ-001'), None)
+            if faq is not None:
+                vetor = self.vectorizador.transform([texto])
+                pontuacoes = cosine_similarity(vetor, self.matriz_tfidf)[0]
+                indices = [i for i, indice_faq in enumerate(self.indices_faq)
+                           if self.base[indice_faq].get('id') == 'FAQ-001']
+                similaridade = max((float(pontuacoes[i]) for i in indices), default=0.0)
+                return {
+                    'encontrado': True,
+                    'id': faq['id'],
+                    'assunto': faq['assunto'],
+                    'pergunta': faq['pergunta'],
+                    'resposta': faq['resposta'],
+                    'similaridade': round(similaridade, 4),
+                }
+
+        # Cobrança repetida da mesma compra: FAQ específica, sem confundir com avaria.
+        if cobranca_duplicada(texto):
+            faq = next((item for item in self.base if item.get('id') == 'FAQ-050'), None)
+            if faq is not None:
+                return {
+                    'encontrado': True,
+                    'id': faq['id'],
+                    'assunto': faq['assunto'],
+                    'pergunta': faq['pergunta'],
+                    'resposta': faq['resposta'],
+                    'similaridade': 1.0,  # correspondência por regra; não é cosseno
+                }
+            return {
+                'encontrado': False,
+                'mensagem': 'FAQ específica de cobrança duplicada não cadastrada.',
+                'similaridade': 0.0,
+            }
+
+        # Casos explícitos de não entrega são encaminhados à FAQ específica.
+        # A orientação é condicional: o direito de reclamar por atraso pressupõe
+        # que o prazo prometido tenha terminado. Evita confundir com avaria.
+        if problema_nao_entrega(texto):
+            faq = next((item for item in self.base if item.get('id') == 'FAQ-015'), None)
+            if faq is not None:
+                vetor = self.vectorizador.transform([texto])
+                pontuacoes = cosine_similarity(vetor, self.matriz_tfidf)[0]
+                indices = [i for i, indice_faq in enumerate(self.indices_faq)
+                           if self.base[indice_faq].get('id') == 'FAQ-015']
+                similaridade = max((float(pontuacoes[i]) for i in indices), default=0.0)
+                return {
+                    'encontrado': True,
+                    'id': faq['id'],
+                    'assunto': faq['assunto'],
+                    'pergunta': faq['pergunta'],
+                    'resposta': (
+                        'Verifique primeiro se o prazo de entrega informado na compra '
+                        'já terminou. Se o prazo foi descumprido, registre a reclamação '
+                        'com o fornecedor e guarde o comprovante do pedido, o prazo '
+                        'prometido e os protocolos. ' + faq['resposta']
+                    ),
+                    'similaridade': round(similaridade, 4),
+                }
+
         vetor_tfidf = self.vectorizador.transform([texto])
         scores_tfidf = cosine_similarity(vetor_tfidf, self.matriz_tfidf)[0]
         scores = scores_tfidf

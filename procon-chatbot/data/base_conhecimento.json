@@ -169,9 +169,7 @@
     "variacoes": [
       "O prazo de entrega não foi respeitado. O que posso fazer?",
       "A encomenda atrasou",
-      "Produto não entregue",
-      "Produto não chegou no prazo prometido",
-      "Pedido consta como entregue, mas não recebi"
+      "Produto não chegou no prazo prometido"
     ]
   },
   {
@@ -556,6 +554,20 @@
       "Meu telefone apresentou problema após alguns dias de uso.",
       "Comprei uma televisão e ela parou de funcionar logo depois.",
       "Produto com defeito dentro da garantia, como proceder?"
+    ]
+  },
+  {
+    "id": "FAQ-050",
+    "assunto": "cobranca_duplicada_mesma_compra",
+    "pergunta": "Meu cartão foi cobrado duas vezes pela mesma compra. O que posso fazer?",
+    "resposta": "Confira a fatura e os comprovantes para verificar se existem duas cobranças efetivadas, e não apenas uma autorização temporária ou lançamento pendente. Se a cobrança em duplicidade for confirmada, entre em contato com o fornecedor e com a administradora do cartão, informe os dois lançamentos e solicite a correção ou o estorno. Guarde comprovantes da compra, faturas, capturas de tela e números de protocolo. Se não houver solução, procure o PROCON para análise do caso. A possibilidade de restituição em dobro depende das circunstâncias e da legislação aplicável, não sendo automática em todo caso. Orientação preliminar, sujeita à validação jurídica pelo PROCON.",
+    "variacoes": [
+      "Meu cartão foi cobrado duas vezes pela mesma compra.",
+      "Paguei duas vezes a mesma compra no cartão.",
+      "Apareceram duas cobranças iguais na minha fatura.",
+      "A loja debitou duas vezes o mesmo pedido.",
+      "Cobrança duplicada no cartão de crédito.",
+      "Fui cobrado em dobro por uma compra."
     ]
   }
 ]
