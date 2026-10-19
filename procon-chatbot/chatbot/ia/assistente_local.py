@@ -150,6 +150,7 @@ class AssistenteLocal:
                 model=self.modelo,
                 messages=mensagens,
                 options={"temperature": 0.1},
+                keep_alive="30m",
             )
 
             complemento = resultado["message"]["content"].strip()

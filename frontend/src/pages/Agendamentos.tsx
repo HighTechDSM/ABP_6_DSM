@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
-import { backend } from '../services/backend'
+import { backend } from '../services/backend.ts'
 
 type Agendamento = {
-  id: string
+  id: string | number
+  usuarioId: number
   name: string
-  birthDate: string
-  cpf: string
   date: string
   time: string
   status: string
@@ -16,30 +15,58 @@ type Agendamento = {
 
 function ListaAgendamentos() {
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([])
+  const [erro, setErro] = useState('')
+  const [carregando, setCarregando] = useState(true)
 
   useEffect(() => {
-    backend.appointments
+    backend.agendamentos
       .list()
-      .then((data: Agendamento[]) => setAgendamentos(data))
-      .catch((e) => {
-        console.error('Erro ao listar agendamentos:', e)
+      .then((data: Agendamento[]) => {
+        setAgendamentos(data)
+        setErro('')
+      })
+      .catch((error: unknown) => {
+        console.error('Erro ao listar agendamentos:', error)
+        setErro('Não foi possível carregar os agendamentos.')
+      })
+      .finally(() => {
+        setCarregando(false)
       })
   }, [])
 
-  const cancelarAgendamento = async (id: string) => {
-    try {
-      await backend.appointments.delete(id)
+  const cancelarAgendamento = async (
+    id: string | number,
+    usuarioId: number,
+  ) => {
+    const confirmar = window.confirm(
+      'Deseja realmente cancelar este agendamento?',
+    )
 
-      setAgendamentos((current) =>
-        current.filter((agendamento) => agendamento.id !== id),
+    if (!confirmar) return
+
+    try {
+      await backend.agendamentos.delete(String(id))
+
+      setAgendamentos((atuais) =>
+        atuais.map((agendamento) =>
+          String(agendamento.id) === String(id)
+            ? { ...agendamento, status: 'cancelado' }
+            : agendamento,
+        ),
       )
-    } catch (e) {
-      alert((e as Error).message)
+    } catch (error: unknown) {
+      const mensagem =
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível cancelar o agendamento.'
+
+      window.alert(mensagem)
     }
   }
 
   const formatarData = (date: string) => {
     if (!date) return ''
+
     const [ano, mes, dia] = date.split('-')
     return `${dia}/${mes}/${ano}`
   }
@@ -72,12 +99,20 @@ function ListaAgendamentos() {
                 <th>Data do agendamento</th>
                 <th>Horário</th>
                 <th>Situação</th>
-                <th></th>
+                <th>Ações</th>
               </tr>
             </thead>
 
             <tbody>
-              {agendamentos.length > 0 ? (
+              {carregando ? (
+                <tr>
+                  <td colSpan={5}>Carregando agendamentos...</td>
+                </tr>
+              ) : erro ? (
+                <tr>
+                  <td colSpan={5}>{erro}</td>
+                </tr>
+              ) : agendamentos.length > 0 ? (
                 agendamentos.map((agendamento) => (
                   <tr key={agendamento.id}>
                     <td>{agendamento.name}</td>
@@ -85,15 +120,20 @@ function ListaAgendamentos() {
                     <td>{agendamento.time}</td>
                     <td>{agendamento.status}</td>
                     <td>
-                      <button
-                        type="button"
-                        className="button button--secondary"
-                        onClick={() =>
-                          cancelarAgendamento(agendamento.id)
-                        }
-                      >
-                        Cancelar Agendamento
-                      </button>
+                      {agendamento.status !== 'cancelado' && (
+                        <button
+                          type="button"
+                          className="button button--secondary"
+                          onClick={() =>
+                            cancelarAgendamento(
+                              agendamento.id,
+                              agendamento.usuarioId,
+                            )
+                          }
+                        >
+                          Cancelar Agendamento
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -102,7 +142,7 @@ function ListaAgendamentos() {
                   <td colSpan={5}>
                     <EmptyState
                       compact
-                      title="Nenhum agendamento carregado"
+                      title="Nenhum agendamento encontrado"
                     />
                   </td>
                 </tr>

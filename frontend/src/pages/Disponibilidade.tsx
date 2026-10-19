@@ -1,306 +1,311 @@
-import { useEffect, useState } from 'react'
-import EmptyState from '../components/EmptyState'
-import MonthCalendar from '../components/MonthCalendar'
-import PageHeader from '../components/PageHeader'
-import { backend } from '../services/backend'
+
+import { useCallback, useEffect, useState } from "react";
+import EmptyState from "../components/EmptyState";
+import MonthCalendar from "../components/MonthCalendar";
+import PageHeader from "../components/PageHeader";
+import { backend } from "../services/backend";
 
 type Agendamento = {
-  id: string
-  name: string
-  birthDate: string
-  cpf: string
-  date: string
-  time: string
-  status?: string
-  criadoEm?: string
-}
+  id: number | string;
+  usuarioId: number;
+  sessaoId?: number;
+  name: string;
+  phone?: string;
+  cpf?: string;
+  date: string;
+  time: string;
+  status: string;
+  criadoEm?: string;
+};
+
+const DIAS_DISPONIVEIS = [
+  "2026-10-26",
+  "2026-10-27",
+  "2026-10-28",
+  "2026-10-29",
+  "2026-10-30",
+];
 
 const gerarHorarios = (inicio: number, fim: number) => {
-  const horarios: string[] = []
+  const horarios: string[] = [];
 
   for (let minutos = inicio; minutos <= fim; minutos += 15) {
-    const hora = Math.floor(minutos / 60)
-    const minuto = minutos % 60
+    const hora = Math.floor(minutos / 60);
+    const minuto = minutos % 60;
 
     horarios.push(
-      `${String(hora).padStart(2, '0')}:${String(minuto).padStart(2, '0')}`,
-    )
+      `${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`,
+    );
   }
 
-  return horarios
-}
+  return horarios;
+};
 
-const HORARIOS_MANHA = gerarHorarios(8 * 60, 11 * 60 + 45)
-const HORARIOS_TARDE = gerarHorarios(12 * 60, 15 * 60 + 15)
+const HORARIOS_MANHA = gerarHorarios(8 * 60, 11 * 60 + 45);
+const HORARIOS_TARDE = gerarHorarios(12 * 60, 15 * 60 + 15);
+
+const statusAtivo = (status: string) =>
+  status === "agendado" || status === "confirmado";
+
+const formatarData = (date: string) => {
+  if (!date) return "";
+
+  const [ano, mes, dia] = date.split("-");
+  return `${dia}/${mes}/${ano}`;
+};
+
+const apenasNumeros = (valor: string) => valor.replace(/\D/g, "");
 
 function Disponibilidade() {
-  const [name, setName] = useState('')
-  const [birthDate, setBirthDate] = useState('')
-  const [cpf, setCpf] = useState('')
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
-  const [selectedDate, setSelectedDate] = useState('')
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const [cancelandoId, setCancelandoId] = useState<string | number | null>(
+    null,
+  );
 
-  // Dias disponíveis vindos do backend
-  const [diasDisponiveis, setDiasDisponiveis] = useState<string[]>([])
-
-  const [agendamentos, setAgendamentos] = useState<Agendamento[]>(() => {
-    const agendamentoSalvo =
-      sessionStorage.getItem('agendamentoRealizado')
-
-    if (!agendamentoSalvo) {
-      return []
-    }
-
-    try {
-      return [JSON.parse(agendamentoSalvo)]
-    } catch {
-      sessionStorage.removeItem('agendamentoRealizado')
-      sessionStorage.removeItem('agendamentoConcluido')
-      return []
-    }
-  })
-
-  const [showUnavailableModal, setShowUnavailableModal] =
-    useState(false)
-
-  const [showSuccessModal, setShowSuccessModal] =
-    useState(false)
-
+  const [erro, setErro] = useState("");
+  const [showUnavailableModal, setShowUnavailableModal] = useState(false);
   const [agendamentoConcluido, setAgendamentoConcluido] =
-    useState<Agendamento | null>(() => {
-      const agendamentoSalvo =
-        sessionStorage.getItem('agendamentoRealizado')
-
-      const concluido =
-        sessionStorage.getItem('agendamentoConcluido') === 'true'
-
-      if (!agendamentoSalvo || !concluido) {
-        return null
-      }
-
-      try {
-        return JSON.parse(agendamentoSalvo)
-      } catch {
-        return null
-      }
-    })
-
-  // Busca os dias disponíveis no backend ao montar o componente
-  useEffect(() => {
-    backend.availability
-      .list()
-      .then((dias: { data: string }[]) => {
-        setDiasDisponiveis(dias.map((d) => d.data))
-      })
-      .catch((e) => {
-        console.error('Erro ao buscar disponibilidade:', e)
-      })
-  }, [])
+    useState<Agendamento | null>(null);
 
   const pessoaIdentificada =
-    name.trim() !== '' &&
-    birthDate !== '' &&
-    cpf.trim() !== ''
+    name.trim().length > 0 &&
+    apenasNumeros(phone).length >= 10 &&
+    apenasNumeros(cpf).length === 11;
 
-  const horariosDoDia = agendamentos
-    .filter(
-      (agendamento) =>
-        agendamento.date === selectedDate,
-    )
-    .map((agendamento) => agendamento.time)
+  const carregarAgendamentos = useCallback(async () => {
+    setCarregando(true);
+
+    try {
+      const resposta = await backend.agendamentos.list();
+      const lista = Array.isArray(resposta) ? resposta : [];
+
+      setAgendamentos(lista);
+      setErro("");
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível carregar os agendamentos.",
+      );
+    } finally {
+      setCarregando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void carregarAgendamentos();
+  }, [carregarAgendamentos]);
+
+  const agendamentosAtivos = agendamentos.filter((item) =>
+    statusAtivo(item.status),
+  );
+
+  const horariosOcupados = agendamentosAtivos
+    .filter((item) => item.date === selectedDate)
+    .map((item) => item.time.slice(0, 5));
 
   const selecionarHorario = async (time: string) => {
-    if (!selectedDate || !pessoaIdentificada) return
+    if (!selectedDate || !pessoaIdentificada || salvando) return;
 
-    // Impede que o usuário faça mais de um agendamento
-    const agendamentoExistente =
-      sessionStorage.getItem('agendamentoRealizado')
-
-    if (agendamentoExistente) {
-      return
+    if (horariosOcupados.includes(time)) {
+      setErro("Este horário já está ocupado. Escolha outro.");
+      await carregarAgendamentos();
+      return;
     }
 
-    const jaAgendado = agendamentos.some(
-      (agendamento) =>
-        agendamento.date === selectedDate &&
-        agendamento.time === time,
-    )
-
-    if (jaAgendado) return
+    setSalvando(true);
+    setErro("");
 
     try {
-      const novoAgendamento = await backend.appointments.create({
+      const resposta = (await backend.agendamentos.create({
         name: name.trim(),
-        birthDate,
-        cpf,
+        phone: apenasNumeros(phone),
+        cpf: apenasNumeros(cpf),
         date: selectedDate,
         time,
-      })
+      })) as Agendamento;
 
-      // Salva o agendamento
-      sessionStorage.setItem(
-        'agendamentoRealizado',
-        JSON.stringify(novoAgendamento),
-      )
+      setAgendamentoConcluido(resposta);
+      await carregarAgendamentos();
 
-      // Marca que o agendamento foi realmente concluído
-      sessionStorage.setItem(
-        'agendamentoConcluido',
-        'true',
-      )
+      // Limpa os campos para o funcionário cadastrar outro cidadão.
+      setName("");
+      setPhone("");
+      setCpf("");
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível realizar o agendamento.",
+      );
 
-      setAgendamentos([novoAgendamento])
-      setAgendamentoConcluido(novoAgendamento)
-      setShowSuccessModal(true)
-    } catch (e) {
-      alert((e as Error).message)
+      // Outro funcionário pode ter ocupado o horário simultaneamente.
+      await carregarAgendamentos();
+    } finally {
+      setSalvando(false);
     }
-  }
+  };
 
-  const cancelarAgendamento = async (id: string) => {
+  const cancelarAgendamento = async (agendamento: Agendamento) => {
+    const confirmado = window.confirm(
+      `Deseja cancelar o atendimento de ${agendamento.name} em ${formatarData(
+        agendamento.date,
+      )}, às ${agendamento.time.slice(0, 5)}?`,
+    );
+
+    if (!confirmado) return;
+
+    setCancelandoId(agendamento.id);
+    setErro("");
+
     try {
-      await backend.appointments.delete(id)
+      await backend.agendamentos.cancel(
+        agendamento.id,
+        agendamento.usuarioId,
+      );
 
-      setAgendamentos((current) =>
-        current.filter(
-          (agendamento) =>
-            agendamento.id !== id,
-        ),
-      )
-
-      sessionStorage.removeItem(
-        'agendamentoRealizado',
-      )
-
-      sessionStorage.removeItem(
-        'agendamentoConcluido',
-      )
-
-      setAgendamentoConcluido(null)
-    } catch (e) {
-      alert((e as Error).message)
+      await carregarAgendamentos();
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível cancelar o agendamento.",
+      );
+    } finally {
+      setCancelandoId(null);
     }
-  }
-
-  const formatarData = (date: string) => {
-    if (!date) return ''
-
-    const [ano, mes, dia] = date.split('-')
-
-    return `${dia}/${mes}/${ano}`
-  }
+  };
 
   const renderHorarios = (horarios: string[]) => (
     <div className="availability-times">
       {horarios.map((time) => {
-        const selecionado =
-          horariosDoDia.includes(time)
+        const ocupado = horariosOcupados.includes(time);
 
         return (
           <button
             key={time}
             type="button"
             className={`availability-time ${
-              selecionado
-                ? 'availability-time--selected'
-                : ''
+              ocupado ? "availability-time--selected" : ""
             }`}
             disabled={
-              selecionado ||
-              !!agendamentoConcluido
+              !pessoaIdentificada ||
+              ocupado ||
+              salvando ||
+              carregando
             }
-            onClick={() =>
-              selecionarHorario(time)
+            title={
+              ocupado
+                ? "Horário já ocupado"
+                : !pessoaIdentificada
+                  ? "Preencha nome, telefone e CPF"
+                  : "Agendar neste horário"
             }
+            onClick={() => void selecionarHorario(time)}
           >
             {time}
+            {ocupado ? " · Ocupado" : ""}
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 
   return (
     <div className="page-stack">
       <PageHeader
         eyebrow="Agendamento de atendimento presencial"
         title="Agendamentos"
-        description="Informe seus dados e selecione um dia e horário para realizar o atendimento."
+        description="Área de uso dos funcionários do PROCON para cadastrar cidadãos e marcar atendimentos presenciais."
       />
 
-      {/* IDENTIFICAÇÃO */}
+      {erro && (
+        <div className="availability-warning" role="alert">
+          {erro}
+          <button
+            type="button"
+            className="button button--secondary"
+            onClick={() => setErro("")}
+          >
+            Fechar aviso
+          </button>
+        </div>
+      )}
+
       <section className="panel">
         <div className="panel__heading">
           <div>
-            <span className="section-kicker">
-              Identificação
-            </span>
-
-            <h2>Dados do usuário</h2>
+            <span className="section-kicker">Identificação</span>
+            <h2>Dados do cidadão</h2>
           </div>
         </div>
 
         <div className="field-grid">
           <label className="field-label">
             <span>Nome completo</span>
-
             <input
               type="text"
               value={name}
+              maxLength={150}
               placeholder="Digite o nome completo"
-              onChange={(e) =>
-                setName(e.target.value)
-              }
-              disabled={!!agendamentoConcluido}
+              onChange={(event) => setName(event.target.value)}
             />
           </label>
 
           <label className="field-label">
-            <span>Data de nascimento</span>
-
+            <span>Telefone com DDD</span>
             <input
-              type="date"
-              value={birthDate}
-              onChange={(e) =>
-                setBirthDate(e.target.value)
-              }
-              disabled={!!agendamentoConcluido}
+              type="tel"
+              value={phone}
+              maxLength={20}
+              placeholder="Ex.: (12) 99999-9999"
+              onChange={(event) => setPhone(event.target.value)}
             />
           </label>
 
           <label className="field-label">
             <span>CPF</span>
-
             <input
               type="text"
               value={cpf}
-              placeholder="Digite o CPF"
+              inputMode="numeric"
               maxLength={14}
-              onChange={(e) =>
-                setCpf(e.target.value)
-              }
-              disabled={!!agendamentoConcluido}
+              placeholder="Digite o CPF"
+              onChange={(event) => setCpf(event.target.value)}
             />
           </label>
         </div>
 
-        {!pessoaIdentificada && !agendamentoConcluido && (
+        {!pessoaIdentificada && (
           <p className="availability-identification-hint">
-            Preencha os três campos para liberar a marcação do atendimento.
+            Preencha o nome, um telefone com DDD e os 11 números do CPF para
+            liberar a seleção de horários.
           </p>
         )}
       </section>
 
-      {/* CALENDÁRIO */}
       <section className="panel">
         <div className="panel__heading">
           <div>
-            <span className="section-kicker">
-              Visão mensal
-            </span>
-
+            <span className="section-kicker">26 a 30 de outubro de 2026</span>
             <h2>Calendário de disponibilidade</h2>
           </div>
+
+          <button
+            type="button"
+            className="button button--secondary"
+            onClick={() => void carregarAgendamentos()}
+            disabled={carregando}
+          >
+            {carregando ? "Atualizando..." : "Atualizar agenda"}
+          </button>
         </div>
 
         <MonthCalendar
@@ -308,16 +313,14 @@ function Disponibilidade() {
           selectionMode="single"
           selectedDate={selectedDate}
           bookedDates={[]}
-          availableDates={diasDisponiveis}
+          availableDates={DIAS_DISPONIVEIS}
           onDateChange={(date) => {
-            setSelectedDate(date)
+            setSelectedDate(date);
+            setErro("");
           }}
-          onUnavailableDate={() => {
-            setShowUnavailableModal(true)
-          }}
+          onUnavailableDate={() => setShowUnavailableModal(true)}
         />
 
-        {/* MODAL DE DIA INDISPONÍVEL */}
         {showUnavailableModal && (
           <div className="availability-modal-overlay">
             <div
@@ -326,25 +329,17 @@ function Disponibilidade() {
               aria-modal="true"
               aria-labelledby="availability-modal-title"
             >
-              <span className="section-kicker">
-                Atenção
-              </span>
-
+              <span className="section-kicker">Atenção</span>
               <h3 id="availability-modal-title">
-                Este dia não está disponível para atendimentos!
+                Dia indisponível para atendimento
               </h3>
-
               <p>
-                Selecione um dia disponível para o agendamento
-                (dias que estão na cor azul).
+                Selecione uma data entre 26 e 30 de outubro de 2026.
               </p>
-
               <button
                 type="button"
                 className="button button--primary availability-modal__button"
-                onClick={() =>
-                  setShowUnavailableModal(false)
-                }
+                onClick={() => setShowUnavailableModal(false)}
               >
                 OK
               </button>
@@ -352,68 +347,50 @@ function Disponibilidade() {
           </div>
         )}
 
-        {/* HORÁRIOS */}
-        {selectedDate && pessoaIdentificada && (
+        {selectedDate && (
           <div className="availability-schedule">
             <div className="availability-schedule__header">
               <div>
-                <span className="section-kicker">
-                  Horários disponíveis
-                </span>
-
-                <h3>
-                  {formatarData(selectedDate)}
-                </h3>
+                <span className="section-kicker">Horários</span>
+                <h3>{formatarData(selectedDate)}</h3>
               </div>
-
               <span className="availability-schedule__hint">
-                {agendamentoConcluido
-                  ? 'Você já possui um agendamento'
-                  : 'Clique em um horário para marcar o atendimento'}
+                {carregando
+                  ? "Carregando horários..."
+                  : "Horários ocupados aparecem desabilitados"}
               </span>
             </div>
 
             <div className="availability-schedule__columns">
-              {/* MANHÃ */}
               <div className="availability-period">
                 <div className="availability-period__header">
                   <strong>Manhã</strong>
                   <span>08:00 às 11:45</span>
                 </div>
-
                 {renderHorarios(HORARIOS_MANHA)}
               </div>
 
-              {/* TARDE */}
               <div className="availability-period">
                 <div className="availability-period__header">
                   <strong>Tarde</strong>
                   <span>12:00 às 15:15</span>
                 </div>
-
                 {renderHorarios(HORARIOS_TARDE)}
               </div>
             </div>
           </div>
         )}
 
-        {/* AVISO DE IDENTIFICAÇÃO */}
-        {selectedDate && !pessoaIdentificada && (
-          <div className="availability-warning">
-            Preencha os dados do usuário acima para visualizar os horários
-            disponíveis.
-          </div>
-        )}
+        <p className="availability-identification-hint">
+          {agendamentosAtivos.length} atendimento(s) ativo(s) na agenda.
+          Cancelamentos liberam o horário correspondente.
+        </p>
       </section>
 
-      {/* AGENDA */}
       <section className="panel panel--table">
         <div className="panel__heading">
           <div>
-            <span className="section-kicker">
-              Atendimentos marcados
-            </span>
-
+            <span className="section-kicker">Atendimentos registrados</span>
             <h2>Agenda</h2>
           </div>
         </div>
@@ -422,11 +399,13 @@ function Disponibilidade() {
           <table>
             <thead>
               <tr>
-                <th>Usuário</th>
+                <th>Cidadão</th>
+                <th>Telefone</th>
+                <th>CPF</th>
                 <th>Data</th>
                 <th>Horário</th>
                 <th>Situação</th>
-                <th></th>
+                <th>Ação</th>
               </tr>
             </thead>
 
@@ -434,43 +413,42 @@ function Disponibilidade() {
               {agendamentos.length > 0 ? (
                 agendamentos.map((agendamento) => (
                   <tr key={agendamento.id}>
+                    <td>{agendamento.name}</td>
+                    <td>{agendamento.phone || "—"}</td>
+                    <td>{agendamento.cpf || "—"}</td>
+                    <td>{formatarData(agendamento.date)}</td>
+                    <td>{agendamento.time.slice(0, 5)}</td>
+                    <td>{agendamento.status}</td>
                     <td>
-                      {agendamento.name}
-                    </td>
-
-                    <td>
-                      {formatarData(
-                        agendamento.date,
+                      {statusAtivo(agendamento.status) ? (
+                        <button
+                          type="button"
+                          className="button button--secondary"
+                          disabled={cancelandoId === agendamento.id}
+                          onClick={() =>
+                            void cancelarAgendamento(agendamento)
+                          }
+                        >
+                          {cancelandoId === agendamento.id
+                            ? "Cancelando..."
+                            : "Cancelar"}
+                        </button>
+                      ) : (
+                        "—"
                       )}
-                    </td>
-
-                    <td>
-                      {agendamento.time}
-                    </td>
-
-                    <td>Agendado</td>
-
-                    <td>
-                      <button
-                        type="button"
-                        className="button button--secondary"
-                        onClick={() =>
-                          cancelarAgendamento(
-                            agendamento.id,
-                          )
-                        }
-                      >
-                        Cancelar Agendamento
-                      </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr className="table-empty-row">
-                  <td colSpan={5}>
+                  <td colSpan={7}>
                     <EmptyState
                       compact
-                      title="Nenhum atendimento marcado"
+                      title={
+                        carregando
+                          ? "Carregando agendamentos..."
+                          : "Nenhum atendimento registrado"
+                      }
                     />
                   </td>
                 </tr>
@@ -480,8 +458,7 @@ function Disponibilidade() {
         </div>
       </section>
 
-      {/* MODAL DE AGENDAMENTO CONCLUÍDO */}
-      {showSuccessModal && agendamentoConcluido && (
+      {agendamentoConcluido && (
         <div className="home-success-modal-overlay">
           <div
             className="home-success-modal"
@@ -490,10 +467,7 @@ function Disponibilidade() {
             aria-labelledby="home-success-modal-title"
           >
             <div className="home-success-modal__image">
-              <img
-                src="/chatbot_happy.png"
-                alt="Chatbot"
-              />
+              <img src="/chatbot_happy.png" alt="Chatbot" />
             </div>
 
             <div className="home-success-modal__content">
@@ -502,39 +476,23 @@ function Disponibilidade() {
               </span>
 
               <h3 id="home-success-modal-title">
-                Seu agendamento foi concluído com sucesso!
+                Atendimento agendado com sucesso!
               </h3>
 
               <p>
-                Compareça no dia{' '}
-                <strong>
-                  {formatarData(
-                    agendamentoConcluido.date,
-                  )}
-                </strong>{' '}
-                às{' '}
-                <strong>
-                  {agendamentoConcluido.time}
-                </strong>
-                .
+                Cidadão: <strong>{agendamentoConcluido.name}</strong>
                 <br />
+                Data:{" "}
+                <strong>{formatarData(agendamentoConcluido.date)}</strong>
                 <br />
-
-                Não se esqueça de levar os seguintes documentos:
-                <br />
-                <br />
-
-                • RG ou CNH
-                <br />
-                • Comprovante de residência dos últimos 3 meses
+                Horário:{" "}
+                <strong>{agendamentoConcluido.time.slice(0, 5)}</strong>
               </p>
 
               <button
                 type="button"
                 className="button button--primary home-success-modal__button"
-                onClick={() =>
-                  setShowSuccessModal(false)
-                }
+                onClick={() => setAgendamentoConcluido(null)}
               >
                 OK
               </button>
@@ -543,7 +501,7 @@ function Disponibilidade() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default Disponibilidade
+export default Disponibilidade;

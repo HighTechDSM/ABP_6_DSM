@@ -169,7 +169,9 @@
     "variacoes": [
       "O prazo de entrega não foi respeitado. O que posso fazer?",
       "A encomenda atrasou",
-      "Produto não chegou no prazo prometido"
+      "Produto não entregue",
+      "Produto não chegou no prazo prometido",
+      "Pedido consta como entregue, mas não recebi"
     ]
   },
   {

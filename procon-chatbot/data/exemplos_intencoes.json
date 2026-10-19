@@ -81,6 +81,10 @@
     "intencao": "produto_nao_entregue"
   },
   {
+    "texto": "Produto não foi entregue",
+    "intencao": "produto_nao_entregue"
+  },
+  {
     "texto": "Recebi uma cobrança que não reconheço",
     "intencao": "cobranca_indevida"
   },
