@@ -1,3 +1,4 @@
+
 import type {
   BackendConversation,
   BackendMessage,
@@ -6,16 +7,8 @@ import type {
   Message,
 } from './types'
 
-interface ImportMetaEnv {
-  readonly VITE_API_URL?: string
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
-
-// Usa a URL configurada no .env do frontend.
-// Se ela não existir, utiliza a porta padrão do backend.
+// Usa a URL configurada no ambiente do Vite.
+// Se não existir, utiliza a porta padrão do backend.
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:3001'
 ).replace(/\/+$/, '')
