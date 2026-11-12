@@ -67,14 +67,34 @@ function makeMessage(conversationId, text, direction) {
   }
 }
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:5173',
+
+  // Domínio principal do frontend
+  'https://abp-6-dsm-fa8e.vercel.app',
+
+  // Deployment do WhatsApp que aparece no erro
+  'https://abp-6-dsm-whatsapp-ofl8yhqy2-daffis-projects-1df5e93d.vercel.app',
+]
+
 async function handle(request, response) {
   const origin = request.headers.origin
-  if (origin === 'https://abp-6-dsm-fa8e.vercel.app') {
+
+  if (origin && allowedOrigins.includes(origin)) {
     response.setHeader('Access-Control-Allow-Origin', origin)
     response.setHeader('Vary', 'Origin')
-    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    response.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+    response.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, POST, OPTIONS',
+    )
+    response.setHeader(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization',
+    )
   }
+
   if (request.method === 'OPTIONS') {
     response.writeHead(204)
     response.end()
