@@ -10,7 +10,7 @@ import type {
 // Usa a URL configurada no ambiente do Vite.
 // Se não existir, utiliza a porta padrão do backend.
 const API_URL = (
-  import.meta.env.VITE_API_URL || 'http://localhost:3001'
+  import.meta.env.VITE_API_URL || 'https://abp-6-dsm.onrender.com'
 ).replace(/\/+$/, '')
 
 async function request<T>(
