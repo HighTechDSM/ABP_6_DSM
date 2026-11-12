@@ -27,7 +27,7 @@ availabilityRouter.post('/', (req: Request, res: Response) => {
 
 availabilityRouter.put('/:id', (req: Request, res: Response) => {
   try {
-    res.json(availabilityService.update(req.params.id, req.body))
+    res.json(availabilityService.update(req.params.id ? req.params.id[0]  : req.params.id, req.body))
   } catch (e) {
     res.status(404).json({ error: (e as Error).message })
   }
@@ -35,7 +35,7 @@ availabilityRouter.put('/:id', (req: Request, res: Response) => {
 
 availabilityRouter.patch('/:id/toggle', (req: Request, res: Response) => {
   try {
-    res.json(availabilityService.toggleStatus(req.params.id))
+    res.json(availabilityService.toggleStatus(req.params.id ? req.params.id[0]  : req.params.id))
   } catch (e) {
     res.status(404).json({ error: (e as Error).message })
   }
@@ -43,7 +43,7 @@ availabilityRouter.patch('/:id/toggle', (req: Request, res: Response) => {
 
 availabilityRouter.delete('/:id', (req: Request, res: Response) => {
   try {
-    res.json(availabilityService.delete(req.params.id))
+    res.json(availabilityService.delete(req.params.id ? req.params.id[0]  : req.params.id))
   } catch (e) {
     res.status(404).json({ error: (e as Error).message })
   }

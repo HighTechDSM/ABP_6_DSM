@@ -28,7 +28,7 @@ appointmentsRouter.get('/', (req: Request, res: Response) => {
 })
 
 appointmentsRouter.get('/:id', (req: Request, res: Response) => {
-  const item = appointmentsService.getById(req.params.id)
+  const item = appointmentsService.getById(req.params.id ? req.params.id[0]  : req.params.id)
   if (!item) return res.status(404).json({ error: 'Agendamento não encontrado.' })
   res.json(item)
 })
@@ -44,7 +44,7 @@ appointmentsRouter.post('/', (req: Request, res: Response) => {
 appointmentsRouter.patch('/:id/status', (req: Request, res: Response) => {
   try {
     const { status } = req.body
-    res.json(appointmentsService.updateStatus(req.params.id, status))
+    res.json(appointmentsService.updateStatus(req.params.id ? req.params.id[0]  : req.params.id, status))
   } catch (e) {
     res.status(404).json({ error: (e as Error).message })
   }
@@ -52,7 +52,7 @@ appointmentsRouter.patch('/:id/status', (req: Request, res: Response) => {
 
 appointmentsRouter.delete('/:id', (req: Request, res: Response) => {
   try {
-    res.json(appointmentsService.delete(req.params.id))
+    res.json(appointmentsService.delete(req.params.id ? req.params.id[0]  : req.params.id))
   } catch (e) {
     res.status(404).json({ error: (e as Error).message })
   }
