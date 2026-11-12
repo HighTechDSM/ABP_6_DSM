@@ -81,7 +81,7 @@ async function handle(request, response) {
     return
   }
 
-  const url = new URL(request.url || '/', `http://${request.headers.host || 'localhost'}`)
+  const url = new URL(request.url || '/', `http://${request.headers.host || 'https://abp-6-dsm-fa8e.vercel.app'}`)
   if (request.method === 'GET' && url.pathname === '/api/health') {
     send(response, 200, { status: 'ok', service: 'whatsapp-chat-simulator' })
     return
@@ -190,7 +190,7 @@ const isMainModule = process.argv[1] && path.resolve(process.argv[1]) === fileUR
 if (isMainModule) {
   try {
     await startServer()
-    console.log(`API do simulador: http://localhost:${port}`)
+    console.log(`API do simulador: https://abp-6-dsm-fa8e.vercel.app`)
     console.log(`Dados persistidos em: ${dataFile}`)
     const shutdown = () => { void closeServer().then(() => process.exit(0)) }
     process.once('SIGINT', shutdown)
