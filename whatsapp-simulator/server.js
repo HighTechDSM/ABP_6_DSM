@@ -69,7 +69,7 @@ function makeMessage(conversationId, text, direction) {
 
 async function handle(request, response) {
   const origin = request.headers.origin
-  if (origin === 'https://abp-6-dsm-fa8e.vercel.app' || origin === 'http://localhost:3000' || origin === 'http://127.0.0.1:3000') {
+  if (origin === 'https://abp-6-dsm-fa8e.vercel.app') {
     response.setHeader('Access-Control-Allow-Origin', origin)
     response.setHeader('Vary', 'Origin')
     response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
