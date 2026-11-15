@@ -227,9 +227,15 @@ async function responderAgendamento(
   });
 }
 
+interface SessaoAgendamento {
+  usuario_id: number | null;
+  agendamento_data_temp: Date | string | null;
+  agendamento_horario_temp: string | null;
+}
+
 async function processarAgendamento(
   res: Response,
-  sessao: any,
+  sessao: SessaoAgendamento,
   sessaoId: number,
   etapa: EtapaAgendamento,
   texto: string,

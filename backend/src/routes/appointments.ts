@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express'
-import { appointmentsService } from '../services/appointments.service'
+import { appointmentsService } from '../services/appointments.service.js'
 
 export const appointmentsRouter = Router()
 

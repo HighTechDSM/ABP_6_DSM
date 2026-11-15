@@ -1,130 +1,194 @@
 
 const API_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+  import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
-const handleResponse = async (response: Response): Promise<any> => {
+
+// TRATAMENTO DAS RESPOSTAS DA API
+const handleResponse = async <T>(
+  response: Response,
+): Promise<T> => {
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
+    const errorData: unknown = await response
+      .json()
+      .catch(() => ({}));
 
-    throw new Error(
-      errorData.erro ||
-        errorData.error ||
-        errorData.message ||
-        `Erro ${response.status}: ${response.statusText}`,
-    )
+    let mensagem = `Erro ${response.status}: ${response.statusText}`;
+
+    if (typeof errorData === "object" && errorData !== null) {
+      const dados = errorData as Record<string, unknown>;
+
+      const descricao =
+        dados.erro ?? dados.error ?? dados.message;
+
+      if (typeof descricao === "string" && descricao) {
+        mensagem = descricao;
+      }
+    }
+
+    throw new Error(mensagem);
   }
 
-  if (response.status === 204) return null
+  // Respostas sem conteúdo
+  if (response.status === 204) {
+    return null as T;
+  }
 
-  return response.json()
-}
+  return (await response.json()) as T;
+};
 
-const fetchWithError = async (
+
+// REQUISIÇÕES HTTP
+const fetchWithError = async <T>(
   url: string,
   options?: RequestInit,
-): Promise<any> => {
+): Promise<T> => {
   try {
-    const response = await fetch(url, options)
-    return await handleResponse(response)
+    const response = await fetch(url, options);
+
+    return await handleResponse<T>(response);
   } catch (error) {
-    console.error('Erro na requisição:', error)
-    throw error
+    console.error("Erro na requisição:", error);
+    throw error;
   }
-}
+};
 
-const jsonOptions = (method: string, body: unknown): RequestInit => ({
+
+// CONFIGURAÇÕES PARA ENVIO DE JSON
+const jsonOptions = (
+  method: string,
+  body: unknown,
+): RequestInit => ({
   method,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    "Content-Type": "application/json",
+  },
   body: JSON.stringify(body),
-})
+});
 
+
+// TIPOS DOS AGENDAMENTOS
 export type NovoAgendamento = {
-  name: string
-  phone: string
-  cpf: string
-  date: string
-  time: string
-}
+  name: string;
+  phone: string;
+  cpf: string;
+  date: string;
+  time: string;
+};
 
 export type Agendamento = {
-  id: string | number
-  usuarioId: number
-  sessaoId?: number
-  name: string
-  phone: string
-  cpf: string
-  date: string
-  time: string
-  status: string
-  criadoEm?: string
-}
+  id: string | number;
+  usuarioId: number;
+  sessaoId?: number;
+  name: string;
+  phone: string;
+  cpf: string;
+  date: string;
+  time: string;
+  status: string;
+  criadoEm?: string;
+};
 
+// SERVIÇOS DA API
 export const backend = {
+
+  // AGENDAMENTOS
   agendamentos: {
+    // Listar todos os agendamentos
     list: async (): Promise<Agendamento[]> => {
-      return fetchWithError(`${API_URL}/agendamentos`)
-    },
-
-    create: async (data: NovoAgendamento): Promise<Agendamento> => {
-      return fetchWithError(
+      return fetchWithError<Agendamento[]>(
         `${API_URL}/agendamentos`,
-        jsonOptions('POST', data),
-      )
+      );
     },
 
+    // Criar um novo agendamento
+    create: async (
+      data: NovoAgendamento,
+    ): Promise<Agendamento> => {
+      return fetchWithError<Agendamento>(
+        `${API_URL}/agendamentos`,
+        jsonOptions("POST", data),
+      );
+    },
+
+    // Cancelar um agendamento existente
     cancel: async (
       id: string | number,
       usuarioId: number,
     ): Promise<unknown> => {
-      return fetchWithError(
+      return fetchWithError<unknown>(
         `${API_URL}/agendamentos/${id}/cancelar`,
-        jsonOptions('PATCH', { usuarioId }),
-      )
+        jsonOptions("PATCH", { usuarioId }),
+      );
     },
   },
 
+  // DISPONIBILIDADE
   availability: {
-    list: async (): Promise<any> => {
-      return fetchWithError(`${API_URL}/availability`)
+    // Listar todas as disponibilidades
+    list: async (): Promise<unknown> => {
+      return fetchWithError<unknown>(
+        `${API_URL}/availability`,
+      );
     },
 
+    // Consultar disponibilidade por período
     getByRange: async (
       startDate: string,
       endDate: string,
-    ): Promise<any> => {
-      const params = new URLSearchParams({ startDate, endDate })
+    ): Promise<unknown> => {
+      const params = new URLSearchParams({
+        startDate,
+        endDate,
+      });
 
-      return fetchWithError(
+      return fetchWithError<unknown>(
         `${API_URL}/availability/range?${params.toString()}`,
-      )
+      );
     },
 
-    create: async (data: unknown): Promise<any> => {
-      return fetchWithError(
+    // Criar uma nova disponibilidade
+    create: async (
+      data: unknown,
+    ): Promise<unknown> => {
+      return fetchWithError<unknown>(
         `${API_URL}/availability`,
-        jsonOptions('POST', data),
-      )
+        jsonOptions("POST", data),
+      );
     },
 
-    update: async (id: string, data: unknown): Promise<any> => {
-      return fetchWithError(
+    // Atualizar uma disponibilidade existente
+    update: async (
+      id: string,
+      data: unknown,
+    ): Promise<unknown> => {
+      return fetchWithError<unknown>(
         `${API_URL}/availability/${id}`,
-        jsonOptions('PUT', data),
-      )
+        jsonOptions("PUT", data),
+      );
     },
 
-    toggleStatus: async (id: string): Promise<any> => {
-      return fetchWithError(
+    // Alternar o status de disponibilidade
+    toggleStatus: async (
+      id: string,
+    ): Promise<unknown> => {
+      return fetchWithError<unknown>(
         `${API_URL}/availability/${id}/toggle`,
-        { method: 'PATCH' },
-      )
+        {
+          method: "PATCH",
+        },
+      );
     },
 
-    delete: async (id: string): Promise<any> => {
-      return fetchWithError(
+    // Excluir uma disponibilidade
+    delete: async (
+      id: string,
+    ): Promise<unknown> => {
+      return fetchWithError<unknown>(
         `${API_URL}/availability/${id}`,
-        { method: 'DELETE' },
-      )
+        {
+          method: "DELETE",
+        },
+      );
     },
   },
-}
+};
