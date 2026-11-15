@@ -612,8 +612,8 @@ Uma User Story será considerada Entregue quando:
 
 | Sprint | Data de Início | Data de Entrega | Status        |
 |--------|----------------|-----------------|---------------|
-|  1     | (10/08/2026)   | (14/09/2026)    |  Em Andamento |
-|  2     | (15/09/2026)   | (19/10/2026)    |  Não Inciado  |
+|  1     | (10/08/2026)   | (14/09/2026)    |  Concluída    |
+|  2     | (15/09/2026)   | (19/10/2026)    |  Em andamento |
 |  3     | (20/10/2026)   | (23/11/2026)    |  Não Iniciado |
 
 ---
