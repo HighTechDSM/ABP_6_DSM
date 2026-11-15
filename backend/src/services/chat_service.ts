@@ -1,4 +1,3 @@
-
 export interface ProcessarMensagemInput {
   sessionId: string;
   mensagem: string;
@@ -46,14 +45,12 @@ interface RespostaPythonAtendimento {
  */
 async function chamarChatbotPython(
   endpoint: string,
-  dados: Record<string, string>
+  dados: Record<string, string>,
 ): Promise<RespostaPython> {
   const baseUrl = process.env.CHATBOT_API_URL;
 
   if (!baseUrl) {
-    throw new Error(
-      "A variável CHATBOT_API_URL não foi configurada no .env."
-    );
+    throw new Error("A variável CHATBOT_API_URL não foi configurada no .env.");
   }
 
   const url = `${baseUrl.replace(/\/+$/, "")}${endpoint}`;
@@ -73,7 +70,8 @@ async function chamarChatbotPython(
     console.error("Erro ao conectar ao chatbot Python:", error);
 
     throw new Error(
-      "O chatbot Python não está acessível. Verifique se a API está funcionando."
+      "O chatbot Python não está acessível. Verifique se a API está funcionando.",
+      { cause: error },
     );
   }
 
@@ -82,11 +80,11 @@ async function chamarChatbotPython(
 
     console.error(
       `Erro HTTP ${respostaHttp.status} no chatbot Python:`,
-      detalhe
+      detalhe,
     );
 
     throw new Error(
-      `O chatbot Python retornou um erro HTTP (${respostaHttp.status}).`
+      `O chatbot Python retornou um erro HTTP (${respostaHttp.status}).`,
     );
   }
 
@@ -101,7 +99,7 @@ async function chamarChatbotPython(
     typeof dadosResposta.mensagem !== "string"
   ) {
     throw new Error(
-      "A resposta da API Python não contém os campos esperados: tipo e mensagem."
+      "A resposta da API Python não contém os campos esperados: tipo e mensagem.",
     );
   }
 
@@ -113,14 +111,12 @@ async function chamarChatbotPython(
  */
 async function chamarAtendimentoPython(
   sessionId: string,
-  mensagem: string
+  mensagem: string,
 ): Promise<RespostaPythonAtendimento> {
   const baseUrl = process.env.CHATBOT_API_URL;
 
   if (!baseUrl) {
-    throw new Error(
-      "A variável CHATBOT_API_URL não foi configurada no .env."
-    );
+    throw new Error("A variável CHATBOT_API_URL não foi configurada no .env.");
   }
 
   const url = `${baseUrl.replace(/\/+$/, "")}/chat/atendimento`;
@@ -142,11 +138,12 @@ async function chamarAtendimentoPython(
   } catch (error) {
     console.error(
       "Erro ao conectar ao atendimento livre do chatbot Python:",
-      error
+      error,
     );
 
     throw new Error(
-      "O chatbot Python não está acessível. Verifique se a API está funcionando."
+      "O chatbot Python não está acessível. Verifique se a API está funcionando.",
+      { cause: error },
     );
   }
 
@@ -155,11 +152,11 @@ async function chamarAtendimentoPython(
 
     console.error(
       `Erro HTTP ${respostaHttp.status} no atendimento Python:`,
-      detalhe
+      detalhe,
     );
 
     throw new Error(
-      `O atendimento Python retornou um erro HTTP (${respostaHttp.status}).`
+      `O atendimento Python retornou um erro HTTP (${respostaHttp.status}).`,
     );
   }
 
@@ -176,7 +173,7 @@ async function chamarAtendimentoPython(
     typeof dadosResposta.resposta_encontrada !== "boolean"
   ) {
     throw new Error(
-      "A resposta do atendimento Python contém campos ausentes ou inválidos."
+      "A resposta do atendimento Python contém campos ausentes ou inválidos.",
     );
   }
 
@@ -188,7 +185,7 @@ async function chamarAtendimentoPython(
  * Endpoint: POST /chat/iniciar
  */
 export async function iniciarChatbot(
-  sessionId: string
+  sessionId: string,
 ): Promise<RespostaPython> {
   return chamarChatbotPython("/chat/iniciar", {
     session_id: sessionId,
@@ -201,7 +198,7 @@ export async function iniciarChatbot(
  */
 export async function selecionarCategoriaChatbot(
   sessionId: string,
-  mensagem: string
+  mensagem: string,
 ): Promise<RespostaChatbot> {
   const resultado = await chamarChatbotPython("/chat/categoria", {
     session_id: sessionId,
@@ -253,10 +250,7 @@ export async function atenderPerguntaLivre({
   sessionId,
   mensagem,
 }: ProcessarMensagemInput): Promise<RespostaChatbot> {
-  const resultado = await chamarAtendimentoPython(
-    sessionId,
-    mensagem
-  );
+  const resultado = await chamarAtendimentoPython(sessionId, mensagem);
 
   return {
     resposta: resultado.resposta,
@@ -265,9 +259,7 @@ export async function atenderPerguntaLivre({
     finalizada: false,
     necessitaAgendamento: !resultado.resposta_encontrada,
     tipo: "atendimento",
-    ...(resultado.aviso !== undefined
-      ? { aviso: resultado.aviso }
-      : {}),
+    ...(resultado.aviso !== undefined ? { aviso: resultado.aviso } : {}),
     respostaEncontrada: resultado.resposta_encontrada,
     fonte: resultado.fonte ?? null,
   };

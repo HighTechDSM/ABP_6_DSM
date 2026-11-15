@@ -7,6 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "lint": "eslint src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,11 +21,15 @@
     "pg": "^8.23.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.5",
     "@types/pg": "^8.23.1",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.72.2"
   }
 }

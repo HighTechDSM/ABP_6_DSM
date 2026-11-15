@@ -142,8 +142,8 @@ export async function obterUsuario(req: Request, res: Response) {
     }
 
     return res.status(200).json(resultado.rows[0]);
-  } catch (error: unknown) {
-    console.error("Erro ao consultar usuário.");
+  } catch {
+  console.error("Erro ao consultar usuário.");
 
     return res.status(500).json({
       erro: "Não foi possível consultar o usuário.",
