@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express'
-import { availabilityService } from '../services/availability.service'
+import { availabilityService } from '../services/availability.service.js'
 
 export const availabilityRouter = Router()
 

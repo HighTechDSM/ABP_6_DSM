@@ -1,5 +1,5 @@
-import { store, type Agendamento, type AgendamentoStatus } from '../data/store'
-import { gerarCodigo6Digitos, expiracaoEmHoras } from '../utils/code'
+import { store, type Agendamento, type AgendamentoStatus } from '../data/store.js'
+import { gerarCodigo6Digitos, expiracaoEmHoras } from '../utils/code.js'
 
 export const appointmentsService = {
   list(filters?: { date?: string; status?: string }) {

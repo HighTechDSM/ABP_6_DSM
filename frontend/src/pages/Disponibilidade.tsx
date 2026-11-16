@@ -1,22 +1,8 @@
-
 import { useCallback, useEffect, useState } from "react";
 import EmptyState from "../components/EmptyState";
 import MonthCalendar from "../components/MonthCalendar";
 import PageHeader from "../components/PageHeader";
-import { backend } from "../services/backend";
-
-type Agendamento = {
-  id: number | string;
-  usuarioId: number;
-  sessaoId?: number;
-  name: string;
-  phone?: string;
-  cpf?: string;
-  date: string;
-  time: string;
-  status: string;
-  criadoEm?: string;
-};
+import { backend, type Agendamento } from "../services/backend";
 
 const DIAS_DISPONIVEIS = [
   "2026-10-26",
@@ -100,8 +86,35 @@ function Disponibilidade() {
   }, []);
 
   useEffect(() => {
-    void carregarAgendamentos();
-  }, [carregarAgendamentos]);
+    let ativo = true;
+
+    backend.agendamentos
+      .list()
+      .then((resposta) => {
+        if (!ativo) return;
+
+        setAgendamentos(Array.isArray(resposta) ? resposta : []);
+        setErro("");
+      })
+      .catch((error: unknown) => {
+        if (!ativo) return;
+
+        setErro(
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar os agendamentos.",
+        );
+      })
+      .finally(() => {
+        if (ativo) {
+          setCarregando(false);
+        }
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   const agendamentosAtivos = agendamentos.filter((item) =>
     statusAtivo(item.status),
@@ -124,13 +137,13 @@ function Disponibilidade() {
     setErro("");
 
     try {
-      const resposta = (await backend.agendamentos.create({
+      const resposta = await backend.agendamentos.create({
         name: name.trim(),
         phone: apenasNumeros(phone),
         cpf: apenasNumeros(cpf),
         date: selectedDate,
         time,
-      })) as Agendamento;
+      });
 
       setAgendamentoConcluido(resposta);
       await carregarAgendamentos();
@@ -166,10 +179,7 @@ function Disponibilidade() {
     setErro("");
 
     try {
-      await backend.agendamentos.cancel(
-        agendamento.id,
-        agendamento.usuarioId,
-      );
+      await backend.agendamentos.cancel(agendamento.id, agendamento.usuarioId);
 
       await carregarAgendamentos();
     } catch (error) {
@@ -195,12 +205,7 @@ function Disponibilidade() {
             className={`availability-time ${
               ocupado ? "availability-time--selected" : ""
             }`}
-            disabled={
-              !pessoaIdentificada ||
-              ocupado ||
-              salvando ||
-              carregando
-            }
+            disabled={!pessoaIdentificada || ocupado || salvando || carregando}
             title={
               ocupado
                 ? "Horário já ocupado"
@@ -333,9 +338,7 @@ function Disponibilidade() {
               <h3 id="availability-modal-title">
                 Dia indisponível para atendimento
               </h3>
-              <p>
-                Selecione uma data entre 26 e 30 de outubro de 2026.
-              </p>
+              <p>Selecione uma data entre 26 e 30 de outubro de 2026.</p>
               <button
                 type="button"
                 className="button button--primary availability-modal__button"
@@ -425,9 +428,7 @@ function Disponibilidade() {
                           type="button"
                           className="button button--secondary"
                           disabled={cancelandoId === agendamento.id}
-                          onClick={() =>
-                            void cancelarAgendamento(agendamento)
-                          }
+                          onClick={() => void cancelarAgendamento(agendamento)}
                         >
                           {cancelandoId === agendamento.id
                             ? "Cancelando..."
@@ -471,9 +472,7 @@ function Disponibilidade() {
             </div>
 
             <div className="home-success-modal__content">
-              <span className="section-kicker">
-                Agendamento concluído
-              </span>
+              <span className="section-kicker">Agendamento concluído</span>
 
               <h3 id="home-success-modal-title">
                 Atendimento agendado com sucesso!
@@ -482,8 +481,7 @@ function Disponibilidade() {
               <p>
                 Cidadão: <strong>{agendamentoConcluido.name}</strong>
                 <br />
-                Data:{" "}
-                <strong>{formatarData(agendamentoConcluido.date)}</strong>
+                Data: <strong>{formatarData(agendamentoConcluido.date)}</strong>
                 <br />
                 Horário:{" "}
                 <strong>{agendamentoConcluido.time.slice(0, 5)}</strong>

@@ -1,4 +1,4 @@
-import { store, type Disponibilidade } from '../data/store'
+import { store, type Disponibilidade } from '../data/store.js'
 
 export const availabilityService = {
   list() {

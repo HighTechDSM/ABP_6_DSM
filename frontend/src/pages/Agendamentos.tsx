@@ -1,17 +1,7 @@
 import { useEffect, useState } from 'react'
 import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
-import { backend } from '../services/backend.ts'
-
-type Agendamento = {
-  id: string | number
-  usuarioId: number
-  name: string
-  date: string
-  time: string
-  status: string
-  criadoEm: string
-}
+import { backend, type Agendamento } from '../services/backend'
 
 function ListaAgendamentos() {
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([])
@@ -21,7 +11,7 @@ function ListaAgendamentos() {
   useEffect(() => {
     backend.agendamentos
       .list()
-      .then((data: Agendamento[]) => {
+      .then((data) => {
         setAgendamentos(data)
         setErro('')
       })
@@ -45,7 +35,7 @@ function ListaAgendamentos() {
     if (!confirmar) return
 
     try {
-      await backend.agendamentos.delete(String(id))
+      await backend.agendamentos.cancel(id, usuarioId)
 
       setAgendamentos((atuais) =>
         atuais.map((agendamento) =>

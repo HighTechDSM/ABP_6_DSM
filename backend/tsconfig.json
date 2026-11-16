@@ -3,10 +3,10 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "target": "es2022",
-    "lib": ["es2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "lib": ["ES2022"],
     "types": ["node"],
 
     "strict": true,
