@@ -1,3 +1,4 @@
+
 name: CI
 
 on:
@@ -32,15 +33,19 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
-      - name: Instalar dependencias
+      - name: Instalar dependências
         run: npm ci
 
-      - name: Verificar codigo
+      - name: Verificar código
         run: npm run lint
 
-      - name: Build
-        run: npm run build
+      - name: Executar testes
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://test:test@127.0.0.1:5432/abp_test
 
+      - name: Compilar backend
+        run: npm run build
 
   frontend:
     name: Frontend
