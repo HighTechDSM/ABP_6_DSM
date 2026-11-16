@@ -247,3 +247,36 @@ kbd { font-family: inherit; color: #788781; }
   .contact-copy strong { max-width: 145px; }
   .composer-hint { letter-spacing: -.02em; }
 }
+
+.documents-list {
+  margin-top: 10px;
+  background: #f8f9fa;
+  border-left: 3px solid #168b70;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: left;
+}
+
+.documents-list strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #168b70;
+  font-size: 11px;
+}
+
+.documents-list ul {
+  margin: 0;
+  padding-left: 18px;
+  list-style-type: disc;
+}
+
+.documents-list li {
+  margin-bottom: 4px;
+  color: #43514d;
+  line-height: 1.4;
+}
+
+.documents-list li:last-child {
+  margin-bottom: 0;
+}

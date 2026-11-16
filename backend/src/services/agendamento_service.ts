@@ -240,3 +240,51 @@ export async function cancelarAgendamento(
 
   return resultado.rows[0];
 }
+/**
+ * Retorna a lista de documentos que o cidadão deve levar ao PROCON,
+ * com base na categoria do problema.
+ */
+export function obterDocumentosPorCategoria(categoria?: string | null): string[] {
+  const documentosBase = [
+    "RG (original e cópia) do consumidor ou procurador (com procuração simples)",
+    "Cópia impressa da documentação relacionada ao caso",
+  ];
+
+  switch (categoria) {
+    case "produto_defeito":
+    case "produto_nao_entregue":
+      return [
+        ...documentosBase,
+        "Pedido, nota fiscal ou cupom fiscal",
+        "Comprovante de pagamento ou boleto",
+        "Folheto/anúncio publicitário (se houver)",
+        "Imagem da embalagem do produto (se aplicável)",
+      ];
+    case "cobranca_indevida":
+      return [
+        ...documentosBase,
+        "Contrato (se houver)",
+        "Boleto e comprovante de pagamento",
+        "Extrato bancário ou fatura do cartão",
+        "Cartas de cobrança (se houver)",
+        "Comprovante de negativação (SPC/SERASA), se houver",
+        "Boletim de Ocorrência (para clonagem de cartão)",
+      ];
+    case "servico":
+      return [
+        ...documentosBase,
+        "Conta/Fatura reclamada",
+        "Solicitação de serviço (instalação, vistoria, etc.)",
+        "Comprovante de pagamento",
+        "Termo de parcelamento (se houver)",
+      ];
+    default:
+      return [
+        ...documentosBase,
+        "Contrato ou pedido",
+        "Comprovantes de pagamento (boletos, faturas)",
+        "Nota fiscal ou cupom fiscal",
+        "Outros documentos que comprovem o problema",
+      ];
+  }
+}

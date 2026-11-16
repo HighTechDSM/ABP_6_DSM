@@ -175,90 +175,91 @@ function App() {
     })
   }
 
-  
-async function sendMessage(event?: FormEvent) {
-  event?.preventDefault()
 
-  const text = draft.trim()
+  async function sendMessage(event?: FormEvent) {
+    event?.preventDefault()
 
-  if (!text || !active || isSending) return
+    const text = draft.trim()
 
-  setIsSending(true)
+    if (!text || !active || isSending) return
 
-  try {
-    const result = await chatApi.sendMessage(active.id, text)
-    const now = new Date().toISOString()
+    setIsSending(true)
 
-    // Mensagem enviada pelo cidadão.
-    appendMessage({
-      id: `user-${Date.now()}`,
-      conversationId: active.id,
-      text,
-      createdAt: now,
-      direction: 'out',
-      status: 'read',
-    })
+    try {
+      const result = await chatApi.sendMessage(active.id, text)
+      const now = new Date().toISOString()
 
-    // Resposta real do chatbot.
-    appendMessage({
-      id: `bot-${Date.now()}`,
-      conversationId: active.id,
-      text: result.resposta,
-      createdAt: new Date(Date.now() + 1).toISOString(),
-      direction: 'in',
-    })
-
-    // O backend pode retornar um aviso separado.
-    if (result.aviso) {
+      // Mensagem enviada pelo cidadão.
       appendMessage({
-        id: `aviso-${Date.now()}`,
+        id: `user-${Date.now()}`,
         conversationId: active.id,
-        text: result.aviso,
-        createdAt: new Date(Date.now() + 2).toISOString(),
-        direction: 'in',
+        text,
+        createdAt: now,
+        direction: 'out',
+        status: 'read',
       })
+
+      // Resposta real do chatbot.
+      appendMessage({
+        id: `bot-${Date.now()}`,
+        conversationId: active.id,
+        text: result.resposta,
+        createdAt: new Date(Date.now() + 1).toISOString(),
+        direction: 'in',
+        documentos: result.documentos,
+      })
+
+      // O backend pode retornar um aviso separado.
+      if (result.aviso) {
+        appendMessage({
+          id: `aviso-${Date.now()}`,
+          conversationId: active.id,
+          text: result.aviso,
+          createdAt: new Date(Date.now() + 2).toISOString(),
+          direction: 'in',
+        })
+      }
+
+      setDraft('')
+      setConnection('connected')
+      inputRef.current?.focus()
+    } catch (error) {
+      setNotice(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível enviar a mensagem.',
+      )
+    } finally {
+      setIsSending(false)
     }
-
-    setDraft('')
-    setConnection('connected')
-    inputRef.current?.focus()
-  } catch (error) {
-    setNotice(
-      error instanceof Error
-        ? error.message
-        : 'Não foi possível enviar a mensagem.',
-    )
-  } finally {
-    setIsSending(false)
   }
-}
-  
-async function createConversation() {
-  try {
-    const result = await chatApi.createConversation()
 
-    setConversations((items) => [
-      result.conversation,
-      ...items.filter((item) => item.id !== result.conversation.id),
-    ])
+  async function createConversation() {
+    try {
+      const result = await chatApi.createConversation()
 
-setMessages((items) => ({
-  ...items,
-  [result.conversation.id]: result.initialMessages,
-}))
+      setConversations((items) => [
+        result.conversation,
+        ...items.filter((item) => item.id !== result.conversation.id),
+      ])
 
-    setActiveId(result.conversation.id)
-    setConnection('connected')
-    setModalOpen(false)
-    setNotice('')
-  } catch (error) {
-    setNotice(
-      error instanceof Error
-        ? error.message
-        : 'Não foi possível iniciar a conversa.',
-    )
+      setMessages((items) => ({
+        ...items,
+        [result.conversation.id]: result.initialMessages,
+      }))
+
+      setActiveId(result.conversation.id)
+      setConnection('connected')
+      setModalOpen(false)
+      setNotice('')
+    } catch (error) {
+      setNotice(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível iniciar a conversa.',
+      )
+    }
   }
-}
 
   function handleComposerKey(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -315,57 +316,67 @@ setMessages((items) => ({
         </header>
 
         {connection === 'error' && <div className="demo-banner error-banner"><span>Não foi possível sincronizar esta conversa com a API.</span><button onClick={() => window.location.reload()}><Icon name="refresh" size={14} /> Tentar novamente</button></div>}
-<div className="message-area">
-  <div className="privacy-note">
-    <span className="lock">◆</span> As mensagens desta conversa são privadas.
-  </div>
+        <div className="message-area">
+          <div className="privacy-note">
+            <span className="lock">◆</span> As mensagens desta conversa são privadas.
+          </div>
 
-  {isLoadingMessages && (
-    <div className="messages-loading">Buscando mensagens…</div>
-  )}
-
-  {activeMessages.map((message) => (
-    <div
-      key={message.id}
-      className={`message-line ${
-        message.direction === 'out' ? 'outgoing' : 'incoming'
-      }`}
-    >
-      <div className="message-bubble">
-        <p>{message.text}</p>
-
-        <span className="message-meta">
-          {formatMessageTime(message.createdAt)}
-
-          {message.direction === 'out' && (
-            <span
-              className={`message-status ${
-                message.status === 'read' ? 'read' : ''
-              }`}
-            >
-              <Icon
-                name={message.status === 'sent' ? 'check' : 'checkDouble'}
-                size={14}
-              />
-            </span>
+          {isLoadingMessages && (
+            <div className="messages-loading">Buscando mensagens…</div>
           )}
-        </span>
-      </div>
-    </div>
-  ))}
 
-  {!activeMessages.length && !isLoadingMessages && (
-    <div className="conversation-empty">
-      <span className="empty-icon">
-        <Icon name="chat" size={21} />
-      </span>
-      <strong>Esta conversa está começando</strong>
-      <span>Envie uma mensagem para iniciar o papo.</span>
-    </div>
-  )}
+          {activeMessages.map((message) => (
+            <div
+              key={message.id}
+              className={`message-line ${message.direction === 'out' ? 'outgoing' : 'incoming'
+                }`}
+            >
+              <div className="message-bubble">
+                <p>{message.text}</p>
 
-  <div ref={messageEndRef} />
-</div>
+                {/*lista de documentos (aparece só quando o bot enviar) */}
+                {message.documentos && message.documentos.length > 0 && (
+                  <div className="documents-list">
+                    <strong>📋 Documentos necessários:</strong>
+                    <ul>
+                      {message.documentos.map((doc, i) => (
+                        <li key={i}>{doc}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <span className="message-meta">
+                  {formatMessageTime(message.createdAt)}
+
+                  {message.direction === 'out' && (
+                    <span
+                      className={`message-status ${message.status === 'read' ? 'read' : ''
+                        }`}
+                    >
+                      <Icon
+                        name={message.status === 'sent' ? 'check' : 'checkDouble'}
+                        size={14}
+                      />
+                    </span>
+                  )}
+                </span>
+              </div>
+            </div>
+          ))}
+
+          {!activeMessages.length && !isLoadingMessages && (
+            <div className="conversation-empty">
+              <span className="empty-icon">
+                <Icon name="chat" size={21} />
+              </span>
+              <strong>Esta conversa está começando</strong>
+              <span>Envie uma mensagem para iniciar o papo.</span>
+            </div>
+          )}
+
+          <div ref={messageEndRef} />
+        </div>
 
         <form className="composer" onSubmit={(event) => void sendMessage(event)}>
           <div className="composer-tools"><button type="button" className="icon-button attach-button" aria-label="Anexar arquivo"><Icon name="paperclip" /></button><button type="button" className="icon-button emoji-button" aria-label="Inserir emoji" onClick={() => setDraft((value) => `${value}😊`)}><Icon name="smile" /></button></div>
@@ -378,60 +389,60 @@ setMessages((items) => ({
 
     {notice && <div className="toast"><span className="toast-check"><Icon name="check" size={15} /></span>{notice}<button onClick={() => setNotice('')} aria-label="Fechar"><Icon name="close" size={16} /></button></div>}
 
-    
-{modalOpen && (
-  <div
-    className="modal-backdrop"
-    role="presentation"
-    onMouseDown={(event) => {
-      if (event.target === event.currentTarget) {
-        setModalOpen(false)
-      }
-    }}
-  >
-    <div className="new-chat-modal">
-      <div className="modal-heading">
-        <div>
-          <span className="eyebrow">ATENDIMENTO PROCON</span>
-          <h2>Começar conversa</h2>
+
+    {modalOpen && (
+      <div
+        className="modal-backdrop"
+        role="presentation"
+        onMouseDown={(event) => {
+          if (event.target === event.currentTarget) {
+            setModalOpen(false)
+          }
+        }}
+      >
+        <div className="new-chat-modal">
+          <div className="modal-heading">
+            <div>
+              <span className="eyebrow">ATENDIMENTO PROCON</span>
+              <h2>Começar conversa</h2>
+            </div>
+
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setModalOpen(false)}
+              aria-label="Fechar"
+            >
+              <Icon name="close" />
+            </button>
+          </div>
+
+          <p className="modal-hint">
+            Inicie um atendimento. O chatbot solicitará seus dados
+            diretamente nesta conversa.
+          </p>
+
+          <div className="modal-actions">
+            <button
+              type="button"
+              className="cancel-button"
+              onClick={() => setModalOpen(false)}
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              className="create-button"
+              onClick={() => void createConversation()}
+            >
+              <Icon name="chat" size={16} />
+              Iniciar atendimento
+            </button>
+          </div>
         </div>
-
-        <button
-          type="button"
-          className="icon-button"
-          onClick={() => setModalOpen(false)}
-          aria-label="Fechar"
-        >
-          <Icon name="close" />
-        </button>
       </div>
-
-      <p className="modal-hint">
-        Inicie um atendimento. O chatbot solicitará seus dados
-        diretamente nesta conversa.
-      </p>
-
-      <div className="modal-actions">
-        <button
-          type="button"
-          className="cancel-button"
-          onClick={() => setModalOpen(false)}
-        >
-          Cancelar
-        </button>
-
-        <button
-          type="button"
-          className="create-button"
-          onClick={() => void createConversation()}
-        >
-          <Icon name="chat" size={16} />
-          Iniciar atendimento
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+    )}
   </main>
 }
 
