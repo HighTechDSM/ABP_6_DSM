@@ -111,10 +111,18 @@ async function prosseguirComDadosExistentes(
 
     // Tenta iniciar o chatbot, mas NÃO impede o cadastro se falhar
     try {
-      await iniciarChatbot(sessionId);
-    } catch (erroPython) {
-      console.error("Aviso: chatbot Python indisponível:", erroPython);
-    }
+  await iniciarChatbot(sessionId);
+} catch (erroPython) {
+  console.error(
+    "Erro ao inicializar sessão no chatbot Python:",
+    erroPython,
+  );
+
+  throw new Error(
+    "Não foi possível iniciar a sessão do chatbot Python.",
+    { cause: erroPython },
+  );
+}
 
     const resposta =
       "Seus dados já foram identificados. Digite sua dúvida para continuar o atendimento.";
