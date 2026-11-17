@@ -1,10 +1,9 @@
 
 import os
 import re
+import logging
 
 from ollama import Client
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -194,12 +193,12 @@ class AssistenteLocal:
 
         # 6. FALLBACK SE O OLLAMA FALHAR
         except Exception as error:
-    logger.exception(
-        "Erro ao consultar o Ollama: %s",
-        logging.error
-    )
+            logger.exception(
+                "Erro ao consultar o Ollama: %s",
+                error
+            )
 
-    return {
+            return {
                 "sucesso": True,
                 "resposta": (
                     f"ORIENTAÇÃO DA BASE:\n{resposta_base}\n\n"
