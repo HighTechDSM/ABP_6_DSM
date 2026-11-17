@@ -5,11 +5,16 @@ import PageHeader from "../components/PageHeader";
 import { backend, type Agendamento } from "../services/backend";
 
 const DIAS_DISPONIVEIS = [
-  "2026-10-26",
-  "2026-10-27",
-  "2026-10-28",
-  "2026-10-29",
-  "2026-10-30",
+  "2026-11-17",
+  "2026-11-18",
+  "2026-11-19",
+  "2026-11-20",
+  "2026-11-23",
+  "2026-11-24",
+  "2026-11-25",
+  "2026-11-26",
+  "2026-11-27",
+  "2026-11-30",
 ];
 
 const gerarHorarios = (inicio: number, fim: number) => {
