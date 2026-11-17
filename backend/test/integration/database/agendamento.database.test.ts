@@ -3,7 +3,10 @@ import { config } from "dotenv";
 import pg from "pg";
 import type { PoolClient } from "pg";
 
-config({ path: ".env.test" });
+config({
+  path: ".env.test",
+  quiet: true,
+});
 
 const EXPECTED_PROJECT = "zldnrnvnuvurfmprlxmb";
 const EXPECTED_ENVIRONMENT = "abp6_database_test";
@@ -104,7 +107,7 @@ describe("Segurança do banco de integração", () => {
         `INSERT INTO public.usuarios (nome, telefone)
        VALUES ($1, $2)
        RETURNING id`,
-        ["Usuario Teste Integracao", `teste-${crypto.randomUUID()}`],
+        ["Usuario Teste Integracao", `teste-${crypto.randomUUID().slice(0, 12)}`],
       );
 
       const usuarioId = usuario.rows[0].id;
@@ -114,7 +117,7 @@ describe("Segurança do banco de integração", () => {
         `INSERT INTO public.sessoes (session_id, usuario_id)
        VALUES ($1, $2)
        RETURNING id`,
-        [`teste-${crypto.randomUUID()}`, usuarioId],
+        [`teste-${crypto.randomUUID().slice(0, 12)}`, usuarioId],
       );
 
       const sessaoId = sessao.rows[0].id;
@@ -178,7 +181,7 @@ describe("Segurança do banco de integração", () => {
         `INSERT INTO public.usuarios (nome, telefone)
        VALUES ($1, $2)
        RETURNING id`,
-        ["Usuario Teste Duplicidade", `teste-${crypto.randomUUID()}`],
+        ["Usuario Teste Duplicidade", `teste-${crypto.randomUUID().slice(0, 12)}`],
       );
 
       const usuarioId = usuario.rows[0].id;
@@ -187,7 +190,7 @@ describe("Segurança do banco de integração", () => {
         `INSERT INTO public.sessoes (session_id, usuario_id)
        VALUES ($1, $2)
        RETURNING id`,
-        [`teste-${crypto.randomUUID()}`, usuarioId],
+        [`teste-${crypto.randomUUID().slice(0, 12)}`, usuarioId],
       );
 
       const sessaoId = sessao.rows[0].id;
@@ -252,7 +255,7 @@ describe("Segurança do banco de integração", () => {
         `INSERT INTO public.usuarios (nome, telefone)
        VALUES ($1, $2)
        RETURNING id`,
-        ["Usuario Teste Cancelamento", `teste-${crypto.randomUUID()}`],
+        ["Usuario Teste Cancelamento", `teste-${crypto.randomUUID().slice(0, 12)}`],
       );
 
       const usuarioId = usuario.rows[0].id;
@@ -261,7 +264,7 @@ describe("Segurança do banco de integração", () => {
         `INSERT INTO public.sessoes (session_id, usuario_id)
        VALUES ($1, $2)
        RETURNING id`,
-        [`teste-${crypto.randomUUID()}`, usuarioId],
+        [`teste-${crypto.randomUUID().slice(0, 12)}`, usuarioId],
       );
 
       const sessaoId = sessao.rows[0].id;
@@ -348,7 +351,7 @@ describe("Segurança do banco de integração", () => {
         `INSERT INTO public.usuarios (nome, telefone)
        VALUES ($1, $2)
        RETURNING id`,
-        ["Usuario Teste Status", `teste-${crypto.randomUUID()}`],
+        ["Usuario Teste Status", `teste-${crypto.randomUUID().slice(0, 12)}`],
       );
 
       const usuarioId = usuario.rows[0].id;
@@ -357,7 +360,7 @@ describe("Segurança do banco de integração", () => {
         `INSERT INTO public.sessoes (session_id, usuario_id)
        VALUES ($1, $2)
        RETURNING id`,
-        [`teste-${crypto.randomUUID()}`, usuarioId],
+        [`teste-${crypto.randomUUID().slice(0, 12)}`, usuarioId],
       );
 
       const sessaoId = sessao.rows[0].id;

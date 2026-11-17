@@ -3,7 +3,10 @@ import { describe, it, expect } from "vitest";
 import { config } from "dotenv";
 import pg from "pg";
 
-config({ path: ".env.test" });
+config({
+  path: ".env.test",
+  quiet: true,
+});
 
 describe("Conexão PostgreSQL - Supabase", () => {
   it("deve conectar ao banco de testes", async () => {
