@@ -4,6 +4,9 @@ import re
 
 from ollama import Client
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AssistenteLocal:
     def __init__(self, buscador_conhecimento):
@@ -190,8 +193,13 @@ class AssistenteLocal:
             }
 
         # 6. FALLBACK SE O OLLAMA FALHAR
-        except Exception:
-            return {
+        except Exception as error:
+    logger.exception(
+        "Erro ao consultar o Ollama: %s",
+        logging.error
+    )
+
+    return {
                 "sucesso": True,
                 "resposta": (
                     f"ORIENTAÇÃO DA BASE:\n{resposta_base}\n\n"
