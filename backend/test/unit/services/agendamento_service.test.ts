@@ -1,4 +1,16 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+
+// ==========================================
+// MOCK DO BANCO DE DADOS
+// ==========================================
 
 vi.mock("../../../src/config/database.js", () => ({
   pool: {
@@ -8,6 +20,7 @@ vi.mock("../../../src/config/database.js", () => ({
 }));
 
 import { pool } from "../../../src/config/database.js";
+
 import {
   criarAgendamento,
   listarAgendamentosUsuario,
@@ -18,19 +31,50 @@ import {
 const queryMock = vi.mocked(pool.query);
 const connectMock = vi.mocked(pool.connect);
 
+// Data simulada:
+// 16/11/2026 às 09:00 em São Paulo
+const DATA_ATUAL_SIMULADA = "2026-11-16T12:00:00Z";
+
+const inputValido = {
+  usuarioId: 1,
+  sessaoId: 2,
+  dataAgendamento: "2026-11-20",
+  horario: "10:00",
+};
+
+// ==========================================
+// TESTES DO SERVIÇO
+// ==========================================
+
 describe("Serviço de agendamentos", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+
+    // Simula apenas o relógio do sistema.
+    vi.useFakeTimers({
+      toFake: ["Date"],
+    });
+
+    vi.setSystemTime(
+      new Date(DATA_ATUAL_SIMULADA),
+    );
   });
+
+  afterEach(() => {
+    // Restaura o relógio real após cada teste.
+    vi.useRealTimers();
+  });
+
+  // ========================================
+  // VALIDAÇÃO DE AGENDAMENTOS
+  // ========================================
 
   describe("Validação de agendamentos", () => {
     it("deve rejeitar um usuário inválido", async () => {
       await expect(
         criarAgendamento({
+          ...inputValido,
           usuarioId: 0,
-          sessaoId: 1,
-          dataAgendamento: "2026-10-26",
-          horario: "09:00",
         }),
       ).rejects.toMatchObject({
         statusCode: 400,
@@ -42,21 +86,93 @@ describe("Serviço de agendamentos", () => {
     it("deve rejeitar uma sessão inválida", async () => {
       await expect(
         criarAgendamento({
-          usuarioId: 1,
+          ...inputValido,
           sessaoId: -1,
-          dataAgendamento: "2026-10-26",
-          horario: "09:00",
         }),
       ).rejects.toBeInstanceOf(ErroAgendamento);
 
       expect(connectMock).not.toHaveBeenCalled();
     });
 
-    it("deve rejeitar uma data fora do período permitido", async () => {
+    it("deve rejeitar uma data passada", async () => {
       await expect(
         criarAgendamento({
-          usuarioId: 1,
-          sessaoId: 2,
+          ...inputValido,
+          dataAgendamento: "2026-11-15",
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 400,
+        message:
+          "Não é possível agendar para uma data passada.",
+      });
+
+      expect(connectMock).not.toHaveBeenCalled();
+    });
+
+    it("deve rejeitar um horário fora do expediente", async () => {
+      await expect(
+        criarAgendamento({
+          ...inputValido,
+          horario: "20:00",
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 400,
+      });
+
+      expect(connectMock).not.toHaveBeenCalled();
+    });
+
+    // ======================================
+    // NOVOS TESTES DE DATA DINÂMICA
+    // ======================================
+
+    it("deve rejeitar uma data inexistente", async () => {
+      await expect(
+        criarAgendamento({
+          ...inputValido,
+          dataAgendamento: "2026-11-31",
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 400,
+        message: "A data informada é inválida.",
+      });
+
+      expect(connectMock).not.toHaveBeenCalled();
+    });
+
+    it("deve rejeitar uma data acima de 30 dias", async () => {
+      await expect(
+        criarAgendamento({
+          ...inputValido,
+          dataAgendamento: "2026-12-17",
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 400,
+      });
+
+      expect(connectMock).not.toHaveBeenCalled();
+    });
+
+    it("deve rejeitar um horário que já passou hoje", async () => {
+      await expect(
+        criarAgendamento({
+          ...inputValido,
+          dataAgendamento: "2026-11-16",
+          horario: "08:30",
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 400,
+        message:
+          "Não é possível agendar para um horário que já passou.",
+      });
+
+      expect(connectMock).not.toHaveBeenCalled();
+    });
+
+    it("deve rejeitar o horário atual", async () => {
+      await expect(
+        criarAgendamento({
+          ...inputValido,
           dataAgendamento: "2026-11-16",
           horario: "09:00",
         }),
@@ -67,13 +183,11 @@ describe("Serviço de agendamentos", () => {
       expect(connectMock).not.toHaveBeenCalled();
     });
 
-    it("deve rejeitar um horário fora do expediente", async () => {
+    it("deve rejeitar o intervalo de pausa", async () => {
       await expect(
         criarAgendamento({
-          usuarioId: 1,
-          sessaoId: 2,
-          dataAgendamento: "2026-10-26",
-          horario: "20:00",
+          ...inputValido,
+          horario: "11:50",
         }),
       ).rejects.toMatchObject({
         statusCode: 400,
@@ -82,6 +196,10 @@ describe("Serviço de agendamentos", () => {
       expect(connectMock).not.toHaveBeenCalled();
     });
   });
+
+  // ========================================
+  // CONSULTA DE AGENDAMENTOS
+  // ========================================
 
   describe("Consulta de agendamentos", () => {
     it("deve retornar os agendamentos de um usuário", async () => {
@@ -97,23 +215,33 @@ describe("Serviço de agendamentos", () => {
         rows: agendamentos,
       } as never);
 
-      const resultado = await listarAgendamentosUsuario(1);
+      const resultado =
+        await listarAgendamentosUsuario(1);
 
       expect(resultado).toEqual(agendamentos);
+
       expect(queryMock).toHaveBeenCalledWith(
-        expect.stringContaining("FROM agendamentos"),
+        expect.stringContaining(
+          "FROM agendamentos",
+        ),
         [1],
       );
     });
 
     it("deve rejeitar a consulta com ID inválido", async () => {
-      await expect(listarAgendamentosUsuario(-1)).rejects.toMatchObject({
+      await expect(
+        listarAgendamentosUsuario(-1),
+      ).rejects.toMatchObject({
         statusCode: 400,
       });
 
       expect(queryMock).not.toHaveBeenCalled();
     });
   });
+
+  // ========================================
+  // CANCELAMENTO DE AGENDAMENTOS
+  // ========================================
 
   describe("Cancelamento de agendamentos", () => {
     it("deve cancelar um agendamento existente", async () => {
@@ -127,11 +255,15 @@ describe("Serviço de agendamentos", () => {
         rows: [agendamento],
       } as never);
 
-      const resultado = await cancelarAgendamento(10, 1);
+      const resultado =
+        await cancelarAgendamento(10, 1);
 
       expect(resultado).toEqual(agendamento);
+
       expect(queryMock).toHaveBeenCalledWith(
-        expect.stringContaining("UPDATE agendamentos"),
+        expect.stringContaining(
+          "UPDATE agendamentos",
+        ),
         [10, 1],
       );
     });
@@ -141,13 +273,17 @@ describe("Serviço de agendamentos", () => {
         rows: [],
       } as never);
 
-      await expect(cancelarAgendamento(999, 1)).rejects.toMatchObject({
+      await expect(
+        cancelarAgendamento(999, 1),
+      ).rejects.toMatchObject({
         statusCode: 404,
       });
     });
 
     it("deve rejeitar um ID de agendamento inválido", async () => {
-      await expect(cancelarAgendamento(0, 1)).rejects.toMatchObject({
+      await expect(
+        cancelarAgendamento(0, 1),
+      ).rejects.toMatchObject({
         statusCode: 400,
       });
 
@@ -156,21 +292,26 @@ describe("Serviço de agendamentos", () => {
 
     it("deve propagar erros de consulta ao banco", async () => {
       queryMock.mockRejectedValueOnce(
-        new Error("Falha simulada no PostgreSQL"),
+        new Error(
+          "Falha simulada no PostgreSQL",
+        ),
       );
 
-      await expect(cancelarAgendamento(10, 1)).rejects.toThrow(
+      await expect(
+        cancelarAgendamento(10, 1),
+      ).rejects.toThrow(
         "Falha simulada no PostgreSQL",
       );
     });
   });
 
+  // ========================================
+  // TRANSAÇÕES DE CRIAÇÃO
+  // ========================================
+
   describe("Transações de criação de agendamentos", () => {
     const input = {
-      usuarioId: 1,
-      sessaoId: 2,
-      dataAgendamento: "2026-10-26",
-      horario: "09:00",
+      ...inputValido,
     };
 
     const criarClienteMock = () => {
@@ -179,7 +320,9 @@ describe("Serviço de agendamentos", () => {
         release: vi.fn(),
       };
 
-      connectMock.mockResolvedValue(client as never);
+      connectMock.mockResolvedValue(
+        client as never,
+      );
 
       return client;
     };
@@ -197,18 +340,38 @@ describe("Serviço de agendamentos", () => {
       client.query
         .mockResolvedValueOnce({ rows: [] }) // BEGIN
         .mockResolvedValueOnce({ rows: [] }) // Advisory lock
-        .mockResolvedValueOnce({ rows: [{ id: 2 }] }) // Sessão
-        .mockResolvedValueOnce({ rows: [{ id: 1 }] }) // Usuário
-        .mockResolvedValueOnce({ rows: [] }) // Conflito de horário
-        .mockResolvedValueOnce({ rows: [] }) // Agendamento existente
-        .mockResolvedValueOnce({ rows: [agendamento] }) // INSERT
-        .mockResolvedValueOnce({ rows: [] }); // COMMIT
+        .mockResolvedValueOnce({
+          rows: [{ id: 2 }],
+        }) // Sessão
+        .mockResolvedValueOnce({
+          rows: [{ id: 1 }],
+        }) // Usuário
+        .mockResolvedValueOnce({
+          rows: [],
+        }) // Conflito de horário
+        .mockResolvedValueOnce({
+          rows: [],
+        }) // Agendamento existente
+        .mockResolvedValueOnce({
+          rows: [agendamento],
+        }) // INSERT
+        .mockResolvedValueOnce({
+          rows: [],
+        }); // COMMIT
 
-      const resultado = await criarAgendamento(input);
+      const resultado =
+        await criarAgendamento(input);
 
       expect(resultado).toEqual(agendamento);
-      expect(client.query).toHaveBeenCalledWith("COMMIT");
-      expect(client.query).not.toHaveBeenCalledWith("ROLLBACK");
+
+      expect(client.query).toHaveBeenCalledWith(
+        "COMMIT",
+      );
+
+      expect(client.query).not.toHaveBeenCalledWith(
+        "ROLLBACK",
+      );
+
       expect(client.release).toHaveBeenCalledOnce();
     });
 
@@ -218,15 +381,27 @@ describe("Serviço de agendamentos", () => {
       client.query
         .mockResolvedValueOnce({ rows: [] }) // BEGIN
         .mockResolvedValueOnce({ rows: [] }) // Advisory lock
-        .mockResolvedValueOnce({ rows: [] }) // Sessão não encontrada
-        .mockResolvedValueOnce({ rows: [] }); // ROLLBACK
+        .mockResolvedValueOnce({
+          rows: [],
+        }) // Sessão não encontrada
+        .mockResolvedValueOnce({
+          rows: [],
+        }); // ROLLBACK
 
-      await expect(criarAgendamento(input)).rejects.toMatchObject({
+      await expect(
+        criarAgendamento(input),
+      ).rejects.toMatchObject({
         statusCode: 404,
       });
 
-      expect(client.query).toHaveBeenCalledWith("ROLLBACK");
-      expect(client.query).not.toHaveBeenCalledWith("COMMIT");
+      expect(client.query).toHaveBeenCalledWith(
+        "ROLLBACK",
+      );
+
+      expect(client.query).not.toHaveBeenCalledWith(
+        "COMMIT",
+      );
+
       expect(client.release).toHaveBeenCalledOnce();
     });
 
@@ -236,17 +411,33 @@ describe("Serviço de agendamentos", () => {
       client.query
         .mockResolvedValueOnce({ rows: [] }) // BEGIN
         .mockResolvedValueOnce({ rows: [] }) // Advisory lock
-        .mockResolvedValueOnce({ rows: [{ id: 2 }] }) // Sessão
-        .mockResolvedValueOnce({ rows: [{ id: 1 }] }) // Usuário
-        .mockResolvedValueOnce({ rows: [{ id: 99 }] }) // Conflito
-        .mockResolvedValueOnce({ rows: [] }); // ROLLBACK
+        .mockResolvedValueOnce({
+          rows: [{ id: 2 }],
+        }) // Sessão
+        .mockResolvedValueOnce({
+          rows: [{ id: 1 }],
+        }) // Usuário
+        .mockResolvedValueOnce({
+          rows: [{ id: 99 }],
+        }) // Conflito
+        .mockResolvedValueOnce({
+          rows: [],
+        }); // ROLLBACK
 
-      await expect(criarAgendamento(input)).rejects.toMatchObject({
+      await expect(
+        criarAgendamento(input),
+      ).rejects.toMatchObject({
         statusCode: 409,
       });
 
-      expect(client.query).toHaveBeenCalledWith("ROLLBACK");
-      expect(client.query).not.toHaveBeenCalledWith("COMMIT");
+      expect(client.query).toHaveBeenCalledWith(
+        "ROLLBACK",
+      );
+
+      expect(client.query).not.toHaveBeenCalledWith(
+        "COMMIT",
+      );
+
       expect(client.release).toHaveBeenCalledOnce();
     });
 
@@ -254,13 +445,26 @@ describe("Serviço de agendamentos", () => {
       const client = criarClienteMock();
 
       client.query
-        .mockResolvedValueOnce({ rows: [] }) // BEGIN
-        .mockRejectedValueOnce(new Error("Falha simulada"))
-        .mockResolvedValueOnce({ rows: [] }); // ROLLBACK
+        .mockResolvedValueOnce({
+          rows: [],
+        }) // BEGIN
+        .mockRejectedValueOnce(
+          new Error("Falha simulada"),
+        )
+        .mockResolvedValueOnce({
+          rows: [],
+        }); // ROLLBACK
 
-      await expect(criarAgendamento(input)).rejects.toThrow("Falha simulada");
+      await expect(
+        criarAgendamento(input),
+      ).rejects.toThrow(
+        "Falha simulada",
+      );
 
-      expect(client.query).toHaveBeenCalledWith("ROLLBACK");
+      expect(client.query).toHaveBeenCalledWith(
+        "ROLLBACK",
+      );
+
       expect(client.release).toHaveBeenCalledOnce();
     });
   });
