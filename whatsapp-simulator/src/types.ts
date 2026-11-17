@@ -8,6 +8,14 @@ export type Message = {
   direction: 'in' | 'out'
   status?: MessageStatus
   documentos?: string[]
+  etapa?: string
+}
+
+export type BackendAppointment = {
+  id: string | number
+  date: string
+  time: string
+  status: string
 }
 
 export type Conversation = {

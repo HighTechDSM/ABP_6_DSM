@@ -1,6 +1,7 @@
 
 import type {
   BackendConversation,
+  BackendAppointment,
   BackendMessage,
   ChatResponse,
   Conversation,
@@ -81,6 +82,7 @@ function mapMessage(
     createdAt: item.enviada_em,
     direction: item.tipo === 'BOT' ? 'in' : 'out',
     status: item.tipo === 'USUARIO' ? 'read' : undefined,
+    etapa: item.etapa,
   }
 }
 
@@ -103,6 +105,10 @@ export const chatApi = {
     return items.map((item) =>
       mapMessage(item, conversationId),
     )
+  },
+
+  async getAppointments(): Promise<BackendAppointment[]> {
+    return request<BackendAppointment[]>('/api/agendamentos')
   },
 
   async createConversation(): Promise<{

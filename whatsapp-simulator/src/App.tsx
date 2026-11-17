@@ -1,10 +1,44 @@
-import { FormEvent, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { FormEvent, KeyboardEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { chatApi } from './api'
-import type { Conversation, Message } from './types'
+import type { BackendAppointment, Conversation, Message } from './types'
 
 type Connection = 'checking' | 'connected' | 'error'
 type Filter = 'all' | 'unread' | 'favorites'
 type IconName = 'chat' | 'search' | 'plus' | 'more' | 'phone' | 'video' | 'paperclip' | 'smile' | 'send' | 'mic' | 'spark' | 'check' | 'checkDouble' | 'close' | 'back' | 'refresh' | 'pin' | 'dots' | 'arrow'
+
+const appointmentDates = [
+  '2026-10-26', '2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30',
+]
+
+function makeAppointmentTimes(start: number, end: number) {
+  const times: string[] = []
+  for (let minutes = start; minutes <= end; minutes += 15) {
+    times.push(`${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`)
+  }
+  return times
+}
+
+const morningAppointmentTimes = makeAppointmentTimes(8 * 60, 11 * 60 + 45)
+const afternoonAppointmentTimes = makeAppointmentTimes(12 * 60, 15 * 60 + 15)
+const allAppointmentTimes = [...morningAppointmentTimes, ...afternoonAppointmentTimes]
+
+function dateForChat(date: string) {
+  const [year, month, day] = date.split('-')
+  return `${day}/${month}/${year}`
+}
+
+function appointmentDateFromMessage(value: string): string | null {
+  const match = value.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+  if (!match) return null
+  return `${match[3]}-${match[2]}-${match[1]}`
+}
+
+function weekdayForAppointment(date: string) {
+  const [year, month, day] = date.split('-').map(Number)
+  return new Intl.DateTimeFormat('pt-BR', { weekday: 'short', timeZone: 'UTC' })
+    .format(new Date(Date.UTC(year, month - 1, day, 12)))
+    .replace('.', '')
+}
 
 function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
   const shapes: Record<IconName, ReactNode> = {
@@ -107,11 +141,28 @@ function App() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const [notice, setNotice] = useState('')
   const [isSending, setIsSending] = useState(false)
+  const [appointments, setAppointments] = useState<BackendAppointment[]>([])
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(false)
+  const [appointmentsError, setAppointmentsError] = useState('')
   const messageEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const active = conversations.find((item) => item.id === activeId) ?? null
   const activeMessages = activeId ? messages[activeId] ?? [] : []
+  const currentStage = activeMessages[activeMessages.length - 1]?.etapa
+  const isAppointmentStage = currentStage === 'aguardando_data_agendamento' || currentStage === 'aguardando_horario_agendamento'
+
+  const refreshAppointments = useCallback(async () => {
+    setIsLoadingAppointments(true)
+    setAppointmentsError('')
+    try {
+      setAppointments(await chatApi.getAppointments())
+    } catch {
+      setAppointmentsError('Não foi possível consultar os horários. Atualize a agenda para tentar novamente.')
+    } finally {
+      setIsLoadingAppointments(false)
+    }
+  }, [])
 
   useEffect(() => {
     let ignore = false
@@ -145,6 +196,23 @@ function App() {
   }, [activeId, connection])
 
   useEffect(() => {
+    if (!activeId || connection !== 'connected' || !isAppointmentStage) return
+
+    let ignore = false
+    setIsLoadingAppointments(true)
+    setAppointmentsError('')
+    chatApi.getAppointments().then((items) => {
+      if (!ignore) setAppointments(items)
+    }).catch(() => {
+      if (!ignore) setAppointmentsError('Não foi possível consultar os horários. Atualize a agenda para tentar novamente.')
+    }).finally(() => {
+      if (!ignore) setIsLoadingAppointments(false)
+    })
+
+    return () => { ignore = true }
+  }, [activeId, connection, currentStage, activeMessages.length, isAppointmentStage])
+
+  useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [activeId, activeMessages.length])
 
@@ -175,11 +243,26 @@ function App() {
     })
   }
 
+  function occupiedTimes(date: string) {
+    return new Set(appointments
+      .filter((appointment) => ['agendado', 'confirmado'].includes(appointment.status.toLowerCase()) && appointment.date.slice(0, 10) === date)
+      .map((appointment) => appointment.time.slice(0, 5)))
+  }
 
-  async function sendMessage(event?: FormEvent) {
+  function dateBeforeMessage(messageIndex: number) {
+    for (let index = messageIndex - 1; index >= 0; index -= 1) {
+      const earlierMessage = activeMessages[index]
+      if (earlierMessage.direction !== 'out') continue
+      const date = appointmentDateFromMessage(earlierMessage.text)
+      if (date) return date
+    }
+    return null
+  }
+
+  async function sendMessage(event?: FormEvent, messageOverride?: string) {
     event?.preventDefault()
 
-    const text = draft.trim()
+    const text = (messageOverride ?? draft).trim()
 
     if (!text || !active || isSending) return
 
@@ -207,6 +290,7 @@ function App() {
         createdAt: new Date(Date.now() + 1).toISOString(),
         direction: 'in',
         documentos: result.documentos,
+        etapa: result.etapa,
       })
 
       // O backend pode retornar um aviso separado.
@@ -220,7 +304,7 @@ function App() {
         })
       }
 
-      setDraft('')
+      if (messageOverride === undefined) setDraft('')
       setConnection('connected')
       inputRef.current?.focus()
     } catch (error) {
@@ -325,7 +409,7 @@ function App() {
             <div className="messages-loading">Buscando mensagens…</div>
           )}
 
-          {activeMessages.map((message) => (
+          {activeMessages.map((message, messageIndex) => (
             <div
               key={message.id}
               className={`message-line ${message.direction === 'out' ? 'outgoing' : 'incoming'
@@ -345,6 +429,98 @@ function App() {
                     </ul>
                   </div>
                 )}
+
+                {message.direction === 'in' && messageIndex === activeMessages.length - 1 && message.etapa === 'aguardando_data_agendamento' && (
+                  <div className="appointment-card">
+                    <div className="appointment-card__heading">
+                      <strong>Calendário de disponibilidade</strong>
+                      <span>26 a 30 de outubro de 2026</span>
+                    </div>
+                    {isLoadingAppointments ? (
+                      <p className="appointment-card__state">Consultando horários...</p>
+                    ) : appointmentsError ? (
+                      <div className="appointment-card__error">
+                        <span>{appointmentsError}</span>
+                        <button type="button" onClick={() => void refreshAppointments()}>Atualizar</button>
+                      </div>
+                    ) : (
+                      <div className="appointment-date-grid">
+                        {appointmentDates.map((date) => {
+                          const busy = occupiedTimes(date)
+                          const full = allAppointmentTimes.every((time) => busy.has(time))
+                          return (
+                            <button
+                              key={date}
+                              type="button"
+                              className={`appointment-date${full ? ' appointment-date--full' : ''}`}
+                              disabled={isSending || full}
+                              onClick={() => void sendMessage(undefined, dateForChat(date))}
+                              aria-label={`${weekdayForAppointment(date)}, ${dateForChat(date)}${full ? ', sem horários disponíveis' : ''}`}
+                            >
+                              <strong>{date.slice(8, 10)}</strong>
+                              <span>{weekdayForAppointment(date)}</span>
+                              <small>{full ? 'Lotado' : 'Disponível'}</small>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {message.direction === 'in' && messageIndex === activeMessages.length - 1 && message.etapa === 'aguardando_horario_agendamento' && (() => {
+                  const selectedDate = dateBeforeMessage(messageIndex)
+                  if (!selectedDate) {
+                    return <div className="appointment-card"><p className="appointment-card__state">Selecione uma data para consultar a agenda.</p></div>
+                  }
+
+                  const busy = occupiedTimes(selectedDate)
+                  const renderTimes = (times: string[]) => times.map((time) => {
+                    const occupied = busy.has(time)
+                    return (
+                      <button
+                        key={time}
+                        type="button"
+                        className={`appointment-time${occupied ? ' appointment-time--occupied' : ''}`}
+                        disabled={occupied || isSending || isLoadingAppointments || Boolean(appointmentsError)}
+                        onClick={() => void sendMessage(undefined, time)}
+                        aria-label={`${time}, ${occupied ? 'ocupado' : 'disponível'}`}
+                      >
+                        <strong>{time}</strong>
+                        <small>{occupied ? 'Ocupado' : 'Disponível'}</small>
+                      </button>
+                    )
+                  })
+
+                  return (
+                    <div className="appointment-card">
+                      <div className="appointment-card__heading appointment-card__heading--schedule">
+                        <div><strong>Horários disponíveis</strong><span>{dateForChat(selectedDate)}</span></div>
+                        <button type="button" onClick={() => void refreshAppointments()} disabled={isLoadingAppointments} aria-label="Atualizar agenda"><Icon name="refresh" size={14} /></button>
+                      </div>
+                      <div className="appointment-legend"><span><i className="appointment-legend__available" />Disponível</span><span><i className="appointment-legend__occupied" />Ocupado</span></div>
+                      {isLoadingAppointments ? (
+                        <p className="appointment-card__state">Consultando horários...</p>
+                      ) : appointmentsError ? (
+                        <div className="appointment-card__error">
+                          <span>{appointmentsError}</span>
+                          <button type="button" onClick={() => void refreshAppointments()}>Atualizar</button>
+                        </div>
+                      ) : (
+                        <div className="appointment-periods">
+                          <section className="appointment-period">
+                            <div className="appointment-period__heading"><strong>Manhã</strong><span>08:00 às 11:45</span></div>
+                            <div className="appointment-time-grid">{renderTimes(morningAppointmentTimes)}</div>
+                          </section>
+                          <section className="appointment-period">
+                            <div className="appointment-period__heading"><strong>Tarde</strong><span>12:00 às 15:15</span></div>
+                            <div className="appointment-time-grid">{renderTimes(afternoonAppointmentTimes)}</div>
+                          </section>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
 
                 <span className="message-meta">
                   {formatMessageTime(message.createdAt)}
