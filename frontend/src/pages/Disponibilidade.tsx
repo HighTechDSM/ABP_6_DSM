@@ -228,6 +228,11 @@ function Disponibilidade() {
     </div>
   );
 
+console.log("VERSÃO DO CALENDÁRIO:", {
+  diasDisponiveis: DIAS_DISPONIVEIS,
+  dataAtual: new Date().toISOString(),
+});
+
   return (
     <div className="page-stack">
       <PageHeader
