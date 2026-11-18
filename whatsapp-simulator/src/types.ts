@@ -11,13 +11,6 @@ export type Message = {
   etapa?: string
 }
 
-export type BackendAppointment = {
-  id: string | number
-  date: string
-  time: string
-  status: string
-}
-
 export type Conversation = {
   id: string
   name: string
@@ -46,6 +39,19 @@ export type BackendMessage = {
   enviada_em: string
 }
 
+export type Appointment = {
+  id: string | number
+  usuarioId?: number
+  sessaoId?: number
+  name?: string
+  phone?: string
+  cpf?: string
+  date: string
+  time: string
+  status: string
+  criadoEm?: string
+}
+
 export type ChatResponse = {
   sessionId: string
   resposta: string
@@ -58,4 +64,5 @@ export type ChatResponse = {
   necessitaAgendamento?: boolean
   opcoes?: Record<string, unknown>
   documentos?: string[];
+  agendamento?: Appointment
 }
