@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  workflow_dispatch:
+
   pull_request:
     branches:
       - develop
@@ -12,7 +14,6 @@ on:
       - main
 
 jobs:
-
   backend:
     name: Backend
     runs-on: ubuntu-latest
@@ -28,7 +29,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '22.12.0'
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
@@ -38,9 +39,13 @@ jobs:
       - name: Verificar código
         run: npm run lint
 
-      - name: Build
-        run: npm run build
+      - name: Executar testes
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://test:test@127.0.0.1:5432/abp_test
 
+      - name: Compilar backend
+        run: npm run build
 
   frontend:
     name: Frontend
@@ -57,7 +62,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '22.12.0'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
@@ -69,3 +74,72 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  supabase-integration:
+    name: Supabase Integration
+    runs-on: ubuntu-latest
+
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/develop' ||
+       github.ref == 'refs/heads/main')
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar Secret
+        env:
+          TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+        run: |
+          if [ -z "$TEST_DATABASE_URL" ]; then
+            echo "::error::TEST_DATABASE_URL nao configurado"
+            exit 1
+          fi
+
+      - name: Executar testes PostgreSQL
+        env:
+          TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          DATABASE_SSL: "true"
+        run: npm run test:integration:db
+
+  e2e-smoke:
+    name: E2E Smoke Tests
+    runs-on: ubuntu-latest
+
+    if: github.event_name == 'workflow_dispatch'
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Executar testes E2E
+        run: npx vitest run --config vitest.e2e.config.ts

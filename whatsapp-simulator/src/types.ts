@@ -7,6 +7,15 @@ export type Message = {
   createdAt: string
   direction: 'in' | 'out'
   status?: MessageStatus
+  documentos?: string[]
+  etapa?: string
+}
+
+export type BackendAppointment = {
+  id: string | number
+  date: string
+  time: string
+  status: string
 }
 
 export type Conversation = {
@@ -48,4 +57,5 @@ export type ChatResponse = {
   finalizada?: boolean
   necessitaAgendamento?: boolean
   opcoes?: Record<string, unknown>
+  documentos?: string[];
 }

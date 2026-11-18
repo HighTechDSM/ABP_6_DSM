@@ -3,8 +3,6 @@ import type { Request, Response } from "express";
 import { randomUUID } from "node:crypto";
 import { pool } from "../config/database.js";
 
-const STATUS_ATIVOS = ["agendado", "confirmado"];
-
 const normalizarCpf = (valor: unknown) =>
   String(valor ?? "").replace(/\D/g, "");
 

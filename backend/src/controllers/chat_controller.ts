@@ -8,6 +8,7 @@ import {
 import {
   criarAgendamento as criarAgendamentoService,
   ErroAgendamento,
+  obterDocumentosPorCategoria, // 👈 NOVO
 } from "../services/agendamento_service.js";
 
 type EtapaCadastro =
@@ -108,7 +109,20 @@ async function prosseguirComDadosExistentes(
       [sessaoId, usuarioId],
     );
 
-    await iniciarChatbot(sessionId);
+    // Tenta iniciar o chatbot, mas NÃO impede o cadastro se falhar
+    try {
+  await iniciarChatbot(sessionId);
+} catch (erroPython) {
+  console.error(
+    "Erro ao inicializar sessão no chatbot Python:",
+    erroPython,
+  );
+
+  throw new Error(
+    "Não foi possível iniciar a sessão do chatbot Python.",
+    { cause: erroPython },
+  );
+}
 
     const resposta =
       "Seus dados já foram identificados. Digite sua dúvida para continuar o atendimento.";
@@ -227,9 +241,16 @@ async function responderAgendamento(
   });
 }
 
+interface SessaoAgendamento {
+  usuario_id: number | null;
+  categoria: string | null; // 👈 NOVO
+  agendamento_data_temp: Date | string | null;
+  agendamento_horario_temp: string | null;
+}
+
 async function processarAgendamento(
   res: Response,
-  sessao: any,
+  sessao: SessaoAgendamento,
   sessaoId: number,
   etapa: EtapaAgendamento,
   texto: string,
@@ -396,8 +417,14 @@ async function processarAgendamento(
       [sessaoId],
     );
 
+    // 👇 NOVO: busca os documentos com base na categoria da sessão
+    const documentos = obterDocumentosPorCategoria(sessao.categoria);
+
+    // 👇 MUDOU: inclui a lista de documentos na resposta
     const resposta =
-      `Sua solicitação de atendimento foi registrada para ${formatarData(data)} às ${horario}.`;
+      `✅ Sua solicitação de atendimento foi registrada para ${formatarData(data)} às ${horario}.\n\n` +
+      `📋 Documentos necessários para o atendimento:\n` +
+      documentos.map((doc) => `- ${doc}`).join("\n");
 
     await salvarMensagem(sessaoId, "BOT", resposta, "resposta_usuario");
 
@@ -407,6 +434,7 @@ async function processarAgendamento(
       etapa: "resposta_usuario",
       necessitaAgendamento: false,
       agendamento,
+      documentos, // 👈 NOVO
     });
   } catch (error) {
     if (error instanceof ErroAgendamento) {
@@ -675,7 +703,12 @@ export async function enviarMensagem(req: Request, res: Response) {
         [sessaoId, Number(novoUsuario.rows[0].id)],
       );
 
-      await iniciarChatbot(sessionId);
+      // Tenta iniciar o chatbot, mas NÃO impede o cadastro se falhar
+      try {
+        await iniciarChatbot(sessionId);
+      } catch (erroPython) {
+        console.error("Aviso: chatbot Python indisponível:", erroPython);
+      }
 
       const resposta =
         "Cadastro concluído! Escreva sua dúvida com suas próprias palavras para eu procurar uma orientação na base de conhecimento.";
