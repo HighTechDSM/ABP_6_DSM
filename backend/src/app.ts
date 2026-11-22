@@ -15,16 +15,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://abp-6-dsm.vercel.app",
+  "https://abp-6-dsm-fa8e.vercel.app",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3000",
-        "https://abp-6-dsm.vercel.app",
-      'https://abp-6-dsm-fa8e.vercel.app',
-      "http://localhost:5173",
-    ],
-  })
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
 );
 
 
