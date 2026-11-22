@@ -182,8 +182,8 @@ function converterData(texto: string): string | null {
   if (
     Number.isNaN(dataObj.getTime()) ||
     dataObj.toISOString().slice(0, 10) !== data ||
-    data < "2026-10-26" ||
-    data > "2026-10-30"
+    data < "2026-11-17" ||
+    data > "2026-11-30"
   ) {
     return null;
   }
@@ -300,7 +300,7 @@ async function processarAgendamento(
     return responderAgendamento(
       res,
       sessaoId,
-      "Qual data você prefere? Escolha entre 26 e 30/10/2026 e informe DD/MM/AAAA.",
+      "Qual data você prefere? Escolha entre 17 e 30/11/2026 e informe DD/MM/AAAA.",
       "aguardando_data_agendamento",
     );
   }
@@ -312,7 +312,7 @@ async function processarAgendamento(
       return responderAgendamento(
         res,
         sessaoId,
-        "Data inválida. Escolha uma data entre 26 e 30/10/2026 no formato DD/MM/AAAA.",
+        "Data inválida. Escolha uma data entre 17 e 30/11/2026 no formato DD/MM/AAAA.",
         etapa,
       );
     }
