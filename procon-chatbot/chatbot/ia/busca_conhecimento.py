@@ -15,20 +15,25 @@ RAIZ_PROJETO = Path(__file__).resolve().parents[2]
 ARQUIVO_BASE = RAIZ_PROJETO / 'data' / 'base_conhecimento.json'
 
 OLLAMA_URL = os.getenv(
-    'OLLAMA_URL', 'http://localhost:11434'
+    'OLLAMA_URL',
+    'https://ollama.com'
 ).rstrip('/')
 
+OLLAMA_API_KEY = os.getenv('OLLAMA_API_KEY', '')
+
 MODELO_EMBEDDING = os.getenv(
-    'OLLAMA_EMBED_MODEL', 'nomic-embed-text'
+    'OLLAMA_EMBED_MODEL',
+    'nomic-embed-text'
 )
 
 MODELO_VERIFICADOR = os.getenv(
-    'OLLAMA_VERIFY_MODEL', 'qwen2.5:3b'
+    'OLLAMA_VERIFY_MODEL',
+    'qwen2.5:3b'
 )
 
-# Modelo responsável por formular a resposta ao consumidor.
 MODELO_RESPOSTA = os.getenv(
-    'OLLAMA_RESPONSE_MODEL', MODELO_VERIFICADOR
+    'OLLAMA_RESPONSE_MODEL',
+    'qwen2.5:3b'
 )
 
 logger = logging.getLogger(__name__)
