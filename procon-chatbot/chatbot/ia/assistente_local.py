@@ -1,17 +1,31 @@
-
 import os
 import re
+import logging
 
+logger = logging.getLogger(__name__)
 from ollama import Client
-
 
 class AssistenteLocal:
     def __init__(self, buscador_conhecimento):
         self.buscador = buscador_conhecimento
-        self.modelo = os.getenv("OLLAMA_MODEL", "qwen2.5:3b")
-        self.cliente = Client(
-            host=os.getenv("OLLAMA_HOST", "http://localhost:11434")
+
+        self.modelo = os.getenv("OLLAMA_MODEL", "gemma4:31b")
+
+        api_key = os.getenv("OLLAMA_API_KEY")
+
+        if not api_key:
+            raise RuntimeError(
+            "A variável OLLAMA_API_KEY não foi configurada."
         )
+
+        self.cliente = Client(
+        host="https://ollama.com",
+        headers={
+            "Authorization": f"Bearer {api_key}"
+        },
+        timeout=120,
+    )
+
 
     def responder(self, texto: str) -> dict:
         if not texto or not texto.strip():
@@ -190,7 +204,14 @@ class AssistenteLocal:
             }
 
         # 6. FALLBACK SE O OLLAMA FALHAR
-        except Exception:
+        except Exception as erro:
+            logger.exception(
+                "Erro ao gerar complemento com Ollama. "
+                "Modelo: %s | Host: %s",
+                self.modelo,
+                os.getenv("OLLAMA_HOST", "http://localhost:11434"),
+            )
+
             return {
                 "sucesso": True,
                 "resposta": (
