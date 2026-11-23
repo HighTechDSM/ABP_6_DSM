@@ -1,3 +1,4 @@
+
 import type { Request, Response } from "express";
 import { randomUUID } from "node:crypto";
 import { pool } from "../config/database.js";
@@ -8,8 +9,12 @@ import {
 import {
   criarAgendamento as criarAgendamentoService,
   ErroAgendamento,
-  obterDocumentosPorCategoria, // 👈 NOVO
+  obterDocumentosPorCategoria,
 } from "../services/agendamento_service.js";
+
+// ======================================================
+// TIPOS
+// ======================================================
 
 type EtapaCadastro =
   | "aguardando_nome"
@@ -21,6 +26,13 @@ type EtapaAgendamento =
   | "aguardando_data_agendamento"
   | "aguardando_horario_agendamento"
   | "confirmando_agendamento";
+
+interface SessaoAgendamento {
+  usuario_id: number | null;
+  categoria: string | null;
+  agendamento_data_temp: Date | string | null;
+  agendamento_horario_temp: string | null;
+}
 
 const etapasCadastro: EtapaCadastro[] = [
   "aguardando_nome",
@@ -38,6 +50,10 @@ const etapasAgendamento: EtapaAgendamento[] = [
 const mensagemDadosExistentes =
   "Este usuário já inseriu seus dados! Já podemos prosseguir, digite sua dúvida";
 
+// ======================================================
+// FUNÇÕES AUXILIARES
+// ======================================================
+
 async function salvarMensagem(
   sessaoId: number,
   tipo: "BOT" | "USUARIO",
@@ -51,11 +67,11 @@ async function salvarMensagem(
   );
 }
 
-function validarCPF(cpf: string) {
+function validarCPF(cpf: string): boolean {
   return cpf.replace(/\D/g, "").length === 11;
 }
 
-function normalizarTelefone(telefone: string) {
+function normalizarTelefone(telefone: string): string {
   let numeros = telefone.replace(/\D/g, "");
 
   if (
@@ -68,9 +84,91 @@ function normalizarTelefone(telefone: string) {
   return numeros;
 }
 
-function validarTelefone(telefone: string) {
+function validarTelefone(telefone: string): boolean {
   return /^[1-9]{2}9?\d{8}$/.test(telefone);
 }
+
+function interpretarSimNao(texto: string): boolean | null {
+  const resposta = texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+
+  if (/^(sim|s|quero|aceito|claro|pode ser)$/.test(resposta)) {
+    return true;
+  }
+
+  if (/^(nao|n|agora nao|nao quero|cancelar)$/.test(resposta)) {
+    return false;
+  }
+
+  return null;
+}
+
+function converterData(texto: string): string | null {
+  let data = texto.trim();
+
+  const brasileira = data.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+
+  if (brasileira) {
+    data = `${brasileira[3]}-${brasileira[2]}-${brasileira[1]}`;
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+    return null;
+  }
+
+  const dataObj = new Date(`${data}T00:00:00Z`);
+
+  if (
+    Number.isNaN(dataObj.getTime()) ||
+    dataObj.toISOString().slice(0, 10) !== data ||
+    data < "2026-11-17" ||
+    data > "2026-11-30"
+  ) {
+    return null;
+  }
+
+  return data;
+}
+
+function converterHorario(texto: string): string | null {
+  const match = texto.trim().match(/^(\d{1,2}):([0-5]\d)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const horario = `${match[1]!.padStart(2, "0")}:${match[2]!}`;
+
+  if (
+    horario < "08:00" ||
+    horario > "15:15" ||
+    (horario >= "11:45" && horario < "12:00")
+  ) {
+    return null;
+  }
+
+  return horario;
+}
+
+function formatarData(data: string): string {
+  const [ano, mes, dia] = data.slice(0, 10).split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
+function dataDoBanco(valor: unknown): string {
+  if (valor instanceof Date) {
+    return valor.toISOString().slice(0, 10);
+  }
+
+  return String(valor ?? "").slice(0, 10);
+}
+
+// ======================================================
+// RESPOSTAS DE CADASTRO
+// ======================================================
 
 async function responderCadastro(
   res: Response,
@@ -88,16 +186,20 @@ async function responderCadastro(
   });
 }
 
+// ======================================================
+// CONTINUAR COM USUÁRIO JÁ CADASTRADO
+// ======================================================
+
 async function prosseguirComDadosExistentes(
   res: Response,
   sessaoId: number,
   sessionId: string,
-  usuarioId: number | null = null,
+  usuarioId: number,
 ) {
   try {
     await pool.query(
       `UPDATE sessoes
-       SET usuario_id = COALESCE($2, usuario_id),
+       SET usuario_id = $2,
            cadastro_nome = NULL,
            cadastro_telefone = NULL,
            pergunta_atual = 'resposta_usuario',
@@ -109,20 +211,18 @@ async function prosseguirComDadosExistentes(
       [sessaoId, usuarioId],
     );
 
-    // Tenta iniciar o chatbot, mas NÃO impede o cadastro se falhar
     try {
-  await iniciarChatbot(sessionId);
-} catch (erroPython) {
-  console.error(
-    "Erro ao inicializar sessão no chatbot Python:",
-    erroPython,
-  );
+      await iniciarChatbot(sessionId);
+    } catch (erroPython) {
+      console.error(
+        "Erro ao inicializar sessão no chatbot Python:",
+        erroPython,
+      );
 
-  throw new Error(
-    "Não foi possível iniciar a sessão do chatbot Python.",
-    { cause: erroPython },
-  );
-}
+      throw new Error(
+        "Não foi possível iniciar a sessão do chatbot Python.",
+      );
+    }
 
     const resposta =
       "Seus dados já foram identificados. Digite sua dúvida para continuar o atendimento.";
@@ -149,74 +249,9 @@ async function prosseguirComDadosExistentes(
   }
 }
 
-function interpretarSimNao(texto: string): boolean | null {
-  const resposta = texto
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLowerCase();
-
-  if (/^(sim|s|quero|aceito|claro|pode ser)$/.test(resposta)) {
-    return true;
-  }
-
-  if (/^(nao|n|agora nao|nao quero|cancelar)$/.test(resposta)) {
-    return false;
-  }
-
-  return null;
-}
-
-function converterData(texto: string): string | null {
-  let data = texto.trim();
-  const brasileira = data.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-
-  if (brasileira) {
-    data = `${brasileira[3]}-${brasileira[2]}-${brasileira[1]}`;
-  }
-
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return null;
-
-  const dataObj = new Date(`${data}T00:00:00Z`);
-
-  if (
-    Number.isNaN(dataObj.getTime()) ||
-    dataObj.toISOString().slice(0, 10) !== data ||
-    data < "2026-11-17" ||
-    data > "2026-11-30"
-  ) {
-    return null;
-  }
-
-  return data;
-}
-
-function converterHorario(texto: string): string | null {
-  const match = texto.trim().match(/^(\d{1,2}):([0-5]\d)$/);
-  if (!match) return null;
-
-  const horario = `${match[1]!.padStart(2, "0")}:${match[2]!}`;
-
-  if (
-    horario < "08:00" ||
-    horario > "15:15" ||
-    (horario >= "11:45" && horario < "12:00")
-  ) {
-    return null;
-  }
-
-  return horario;
-}
-
-function formatarData(data: string) {
-  const [ano, mes, dia] = data.slice(0, 10).split("-");
-  return `${dia}/${mes}/${ano}`;
-}
-
-function dataDoBanco(valor: unknown): string {
-  if (valor instanceof Date) return valor.toISOString().slice(0, 10);
-  return String(valor ?? "").slice(0, 10);
-}
+// ======================================================
+// RESPOSTAS DE AGENDAMENTO
+// ======================================================
 
 async function responderAgendamento(
   res: Response,
@@ -226,7 +261,8 @@ async function responderAgendamento(
 ) {
   await pool.query(
     `UPDATE sessoes
-     SET pergunta_atual = $2, atualizado_em = CURRENT_TIMESTAMP
+     SET pergunta_atual = $2,
+         atualizado_em = CURRENT_TIMESTAMP
      WHERE id = $1`,
     [sessaoId, etapa],
   );
@@ -241,12 +277,9 @@ async function responderAgendamento(
   });
 }
 
-interface SessaoAgendamento {
-  usuario_id: number | null;
-  categoria: string | null; // 👈 NOVO
-  agendamento_data_temp: Date | string | null;
-  agendamento_horario_temp: string | null;
-}
+// ======================================================
+// PROCESSAR AGENDAMENTO
+// ======================================================
 
 async function processarAgendamento(
   res: Response,
@@ -256,6 +289,10 @@ async function processarAgendamento(
   texto: string,
 ) {
   await salvarMensagem(sessaoId, "USUARIO", texto, etapa);
+
+  // --------------------------------------------------
+  // ETAPA 1: OFERECENDO AGENDAMENTO
+  // --------------------------------------------------
 
   if (etapa === "oferecendo_agendamento") {
     const escolha = interpretarSimNao(texto);
@@ -287,16 +324,6 @@ async function processarAgendamento(
       );
     }
 
-    await pool.query(
-      `UPDATE sessoes
-       SET pergunta_atual = 'aguardando_data_agendamento',
-           agendamento_data_temp = NULL,
-           agendamento_horario_temp = NULL,
-           atualizado_em = CURRENT_TIMESTAMP
-       WHERE id = $1`,
-      [sessaoId],
-    );
-
     return responderAgendamento(
       res,
       sessaoId,
@@ -304,6 +331,10 @@ async function processarAgendamento(
       "aguardando_data_agendamento",
     );
   }
+
+  // --------------------------------------------------
+  // ETAPA 2: ESCOLHA DA DATA
+  // --------------------------------------------------
 
   if (etapa === "aguardando_data_agendamento") {
     const data = converterData(texto);
@@ -334,6 +365,10 @@ async function processarAgendamento(
       "aguardando_horario_agendamento",
     );
   }
+
+  // --------------------------------------------------
+  // ETAPA 3: ESCOLHA DO HORÁRIO
+  // --------------------------------------------------
 
   if (etapa === "aguardando_horario_agendamento") {
     const horario = converterHorario(texto);
@@ -366,6 +401,10 @@ async function processarAgendamento(
     );
   }
 
+  // --------------------------------------------------
+  // ETAPA 4: CONFIRMAÇÃO
+  // --------------------------------------------------
+
   const escolha = interpretarSimNao(texto);
 
   if (escolha === null) {
@@ -397,7 +436,9 @@ async function processarAgendamento(
   }
 
   const data = dataDoBanco(sessao.agendamento_data_temp);
-  const horario = String(sessao.agendamento_horario_temp ?? "").slice(0, 5);
+  const horario = String(
+    sessao.agendamento_horario_temp ?? "",
+  ).slice(0, 5);
 
   try {
     const agendamento = await criarAgendamentoService({
@@ -417,16 +458,21 @@ async function processarAgendamento(
       [sessaoId],
     );
 
-    // 👇 NOVO: busca os documentos com base na categoria da sessão
-    const documentos = obterDocumentosPorCategoria(sessao.categoria);
+    const documentos = obterDocumentosPorCategoria(
+      sessao.categoria,
+    );
 
-    // 👇 MUDOU: inclui a lista de documentos na resposta
     const resposta =
       `✅ Sua solicitação de atendimento foi registrada para ${formatarData(data)} às ${horario}.\n\n` +
       `📋 Documentos necessários para o atendimento:\n` +
       documentos.map((doc) => `- ${doc}`).join("\n");
 
-    await salvarMensagem(sessaoId, "BOT", resposta, "resposta_usuario");
+    await salvarMensagem(
+      sessaoId,
+      "BOT",
+      resposta,
+      "resposta_usuario",
+    );
 
     return res.status(201).json({
       resposta,
@@ -434,7 +480,7 @@ async function processarAgendamento(
       etapa: "resposta_usuario",
       necessitaAgendamento: false,
       agendamento,
-      documentos, // 👈 NOVO
+      documentos,
     });
   } catch (error) {
     if (error instanceof ErroAgendamento) {
@@ -469,18 +515,31 @@ async function processarAgendamento(
   }
 }
 
-export async function iniciarConversa(_req: Request, res: Response) {
+// ======================================================
+// INICIAR CONVERSA
+// ======================================================
+
+export async function iniciarConversa(
+  _req: Request,
+  res: Response,
+) {
   try {
     const sessionId = randomUUID();
 
     const resultado = await pool.query(
-      `INSERT INTO sessoes (session_id, usuario_id, status, pergunta_atual)
+      `INSERT INTO sessoes (
+         session_id,
+         usuario_id,
+         status,
+         pergunta_atual
+       )
        VALUES ($1, NULL, 'ativa', 'aguardando_nome')
        RETURNING id, session_id, usuario_id, status, pergunta_atual`,
       [sessionId],
     );
 
     const sessao = resultado.rows[0];
+
     const resposta =
       "Olá! Para iniciar seu atendimento no PROCON, qual é o seu nome completo?";
 
@@ -500,11 +559,21 @@ export async function iniciarConversa(_req: Request, res: Response) {
     });
   } catch (error) {
     console.error("Erro ao iniciar conversa:", error);
-    return res.status(500).json({ erro: "Não foi possível iniciar a conversa." });
+
+    return res.status(500).json({
+      erro: "Não foi possível iniciar a conversa.",
+    });
   }
 }
 
-export async function enviarMensagem(req: Request, res: Response) {
+// ======================================================
+// ENVIAR MENSAGEM
+// ======================================================
+
+export async function enviarMensagem(
+  req: Request,
+  res: Response,
+) {
   try {
     const { sessionId, mensagem } = req.body;
 
@@ -514,21 +583,34 @@ export async function enviarMensagem(req: Request, res: Response) {
       typeof mensagem !== "string" ||
       !mensagem.trim()
     ) {
-      return res.status(400).json({ erro: "Informe a sessão e uma mensagem válida." });
+      return res.status(400).json({
+        erro: "Informe a sessão e uma mensagem válida.",
+      });
     }
 
     const texto = mensagem.trim();
 
     const consulta = await pool.query(
-      `SELECT id, session_id, usuario_id, status, categoria, pergunta_atual,
-              cadastro_nome, cadastro_telefone, agendamento_data_temp,
-              agendamento_horario_temp
-       FROM sessoes WHERE session_id = $1`,
+      `SELECT
+         id,
+         session_id,
+         usuario_id,
+         status,
+         categoria,
+         pergunta_atual,
+         cadastro_nome,
+         cadastro_telefone,
+         agendamento_data_temp,
+         agendamento_horario_temp
+       FROM sessoes
+       WHERE session_id = $1`,
       [sessionId],
     );
 
     if (!consulta.rows.length) {
-      return res.status(404).json({ erro: "Sessão não encontrada." });
+      return res.status(404).json({
+        erro: "Sessão não encontrada.",
+      });
     }
 
     const sessao = consulta.rows[0];
@@ -536,8 +618,14 @@ export async function enviarMensagem(req: Request, res: Response) {
     const etapa = String(sessao.pergunta_atual ?? "");
 
     if (sessao.status !== "ativa") {
-      return res.status(409).json({ erro: "Esta conversa não está ativa." });
+      return res.status(409).json({
+        erro: "Esta conversa não está ativa.",
+      });
     }
+
+    // --------------------------------------------------
+    // VERIFICAR SE ESTÁ EM UMA ETAPA DE AGENDAMENTO
+    // --------------------------------------------------
 
     if (etapasAgendamento.includes(etapa as EtapaAgendamento)) {
       return processarAgendamento(
@@ -549,113 +637,133 @@ export async function enviarMensagem(req: Request, res: Response) {
       );
     }
 
+    // --------------------------------------------------
+    // FLUXO DE CADASTRO
+    // --------------------------------------------------
+
     if (etapasCadastro.includes(etapa as EtapaCadastro)) {
       const etapaCadastro = etapa as EtapaCadastro;
 
       await salvarMensagem(
         sessaoId,
         "USUARIO",
-        etapaCadastro === "aguardando_cpf" ? "CPF informado" : texto,
+        etapaCadastro === "aguardando_cpf"
+          ? "CPF informado"
+          : texto,
         etapaCadastro,
       );
+
+      // ----------------------------------------------
+      // ETAPA 1: NOME
+      // ----------------------------------------------
 
       if (etapaCadastro === "aguardando_nome") {
         if (texto.length < 2 || texto.length > 150) {
           return responderCadastro(
-            res, sessaoId, etapaCadastro,
+            res,
+            sessaoId,
+            etapaCadastro,
             "Informe seu nome completo, com até 150 caracteres.",
             "aguardando_nome",
           );
         }
 
-        const existente = await pool.query(
-          `SELECT id FROM usuarios
-           WHERE LOWER(BTRIM(nome)) = LOWER(BTRIM($1)) LIMIT 1`,
-          [texto],
-        );
-
-        const outraSessao = await pool.query(
-          `SELECT 1 FROM sessoes
-           WHERE id <> $2 AND status = 'ativa'
-             AND cadastro_nome IS NOT NULL
-             AND LOWER(BTRIM(cadastro_nome)) = LOWER(BTRIM($1))
-           LIMIT 1`,
-          [texto, sessaoId],
-        );
-
-        if (existente.rows.length || outraSessao.rows.length) {
-          return prosseguirComDadosExistentes(res, sessaoId, sessionId);
-        }
-
+        // Não identifica usuários pelo nome.
+        // O telefone será utilizado para localizar o cadastro.
         await pool.query(
-          `UPDATE sessoes SET cadastro_nome = $2,
-           pergunta_atual = 'aguardando_telefone' WHERE id = $1`,
+          `UPDATE sessoes
+           SET cadastro_nome = $2,
+               pergunta_atual = 'aguardando_telefone',
+               atualizado_em = CURRENT_TIMESTAMP
+           WHERE id = $1`,
           [sessaoId, texto],
         );
 
         return responderCadastro(
-          res, sessaoId, etapaCadastro,
+          res,
+          sessaoId,
+          etapaCadastro,
           "Obrigado! Agora informe seu telefone com DDD.",
           "aguardando_telefone",
         );
       }
+
+      // ----------------------------------------------
+      // ETAPA 2: TELEFONE
+      // ----------------------------------------------
 
       if (etapaCadastro === "aguardando_telefone") {
         const telefone = normalizarTelefone(texto);
 
         if (!validarTelefone(telefone)) {
           return responderCadastro(
-            res, sessaoId, etapaCadastro,
+            res,
+            sessaoId,
+            etapaCadastro,
             "Informe um telefone brasileiro com DDD, por exemplo: 11987654321.",
             "aguardando_telefone",
           );
         }
 
+        // Procura o telefone mesmo que esteja salvo
+        // com parênteses, espaços, hífens ou código 55.
         const existente = await pool.query(
-          "SELECT id FROM usuarios WHERE telefone = $1 LIMIT 1",
-          [telefone],
-        );
-
-        const outraSessao = await pool.query(
-          `SELECT 1 FROM sessoes
-           WHERE id <> $2 AND status = 'ativa' AND cadastro_telefone = $1
+          `SELECT id
+           FROM usuarios
+           WHERE regexp_replace(telefone, '[^0-9]', '', 'g') = $1
+              OR regexp_replace(telefone, '[^0-9]', '', 'g') = $2
            LIMIT 1`,
-          [telefone, sessaoId],
+          [telefone, `55${telefone}`],
         );
 
-        if (existente.rows.length || outraSessao.rows.length) {
+        if (existente.rows.length > 0) {
           return prosseguirComDadosExistentes(
             res,
             sessaoId,
             sessionId,
-            existente.rows.length ? Number(existente.rows[0].id) : null,
+            Number(existente.rows[0].id),
           );
         }
 
+        // Se não encontrou, continua o cadastro.
         await pool.query(
-          `UPDATE sessoes SET cadastro_telefone = $2,
-           pergunta_atual = 'aguardando_cpf' WHERE id = $1`,
+          `UPDATE sessoes
+           SET cadastro_telefone = $2,
+               pergunta_atual = 'aguardando_cpf',
+               atualizado_em = CURRENT_TIMESTAMP
+           WHERE id = $1`,
           [sessaoId, telefone],
         );
 
         return responderCadastro(
-          res, sessaoId, etapaCadastro,
+          res,
+          sessaoId,
+          etapaCadastro,
           "Agora informe seu CPF, com ou sem pontuação.",
           "aguardando_cpf",
         );
       }
 
+      // ----------------------------------------------
+      // ETAPA 3: CPF
+      // ----------------------------------------------
+
       const cpf = texto.replace(/\D/g, "");
 
       if (!validarCPF(cpf)) {
         return responderCadastro(
-          res, sessaoId, etapaCadastro,
+          res,
+          sessaoId,
+          etapaCadastro,
           "Para este teste, informe exatamente 11 dígitos no CPF.",
           "aguardando_cpf",
         );
       }
 
-      const { cadastro_nome: nome, cadastro_telefone: telefone } = sessao;
+      const {
+        cadastro_nome: nome,
+        cadastro_telefone: telefone,
+      } = sessao;
 
       if (!nome || !telefone) {
         return res.status(409).json({
@@ -663,57 +771,93 @@ export async function enviarMensagem(req: Request, res: Response) {
         });
       }
 
+      // Primeiro procura pelo CPF.
       const existente = await pool.query(
-        "SELECT id FROM usuarios WHERE cpf = $1 LIMIT 1",
+        `SELECT id
+         FROM usuarios
+         WHERE cpf = $1
+         LIMIT 1`,
         [cpf],
       );
 
-      if (existente.rows.length) {
+      if (existente.rows.length > 0) {
         return prosseguirComDadosExistentes(
-          res, sessaoId, sessionId, Number(existente.rows[0].id),
+          res,
+          sessaoId,
+          sessionId,
+          Number(existente.rows[0].id),
         );
       }
 
-      const porTelefoneOuCpf = await pool.query(
-        "SELECT id FROM usuarios WHERE telefone = $1 OR cpf = $2",
-        [telefone, cpf],
+      // Verifica se o telefone já pertence a outro cadastro.
+      const porTelefone = await pool.query(
+        `SELECT id
+         FROM usuarios
+         WHERE regexp_replace(telefone, '[^0-9]', '', 'g') = $1
+            OR regexp_replace(telefone, '[^0-9]', '', 'g') = $2`,
+        [telefone, `55${telefone}`],
       );
 
-      if (porTelefoneOuCpf.rows.length) {
-        const usuarioId = porTelefoneOuCpf.rows.length === 1
-          ? Number(porTelefoneOuCpf.rows[0].id)
-          : null;
-
-        return prosseguirComDadosExistentes(res, sessaoId, sessionId, usuarioId);
+      if (porTelefone.rows.length > 1) {
+        return res.status(409).json({
+          erro: "O telefone informado está associado a mais de um cadastro. Verifique os dados.",
+        });
       }
+
+      if (porTelefone.rows.length === 1) {
+        return prosseguirComDadosExistentes(
+          res,
+          sessaoId,
+          sessionId,
+          Number(porTelefone.rows[0].id),
+        );
+      }
+
+      // ----------------------------------------------
+      // CADASTRO DE NOVO USUÁRIO
+      // ----------------------------------------------
 
       const novoUsuario = await pool.query(
         `INSERT INTO usuarios (nome, telefone, cpf)
-         VALUES ($1, $2, $3) RETURNING id`,
+         VALUES ($1, $2, $3)
+         RETURNING id`,
         [nome, telefone, cpf],
       );
 
       await pool.query(
         `UPDATE sessoes
-         SET usuario_id = $2, cadastro_nome = NULL, cadastro_telefone = NULL,
-             categoria = NULL, pergunta_atual = 'resposta_usuario',
-             status = 'ativa', finalizada = FALSE, fim_sessao = NULL,
+         SET usuario_id = $2,
+             cadastro_nome = NULL,
+             cadastro_telefone = NULL,
+             categoria = NULL,
+             pergunta_atual = 'resposta_usuario',
+             status = 'ativa',
+             finalizada = FALSE,
+             fim_sessao = NULL,
              atualizado_em = CURRENT_TIMESTAMP
          WHERE id = $1`,
         [sessaoId, Number(novoUsuario.rows[0].id)],
       );
 
-      // Tenta iniciar o chatbot, mas NÃO impede o cadastro se falhar
+      // Inicializa o chatbot Python.
       try {
         await iniciarChatbot(sessionId);
       } catch (erroPython) {
-        console.error("Aviso: chatbot Python indisponível:", erroPython);
+        console.error(
+          "Aviso: chatbot Python indisponível:",
+          erroPython,
+        );
       }
 
       const resposta =
         "Cadastro concluído! Escreva sua dúvida com suas próprias palavras para eu procurar uma orientação na base de conhecimento.";
 
-      await salvarMensagem(sessaoId, "BOT", resposta, "resposta_usuario");
+      await salvarMensagem(
+        sessaoId,
+        "BOT",
+        resposta,
+        "resposta_usuario",
+      );
 
       return res.status(200).json({
         sessionId,
@@ -724,7 +868,16 @@ export async function enviarMensagem(req: Request, res: Response) {
       });
     }
 
-    await salvarMensagem(sessaoId, "USUARIO", texto, "resposta_usuario");
+    // --------------------------------------------------
+    // ATENDIMENTO PELO CHATBOT
+    // --------------------------------------------------
+
+    await salvarMensagem(
+      sessaoId,
+      "USUARIO",
+      texto,
+      "resposta_usuario",
+    );
 
     const resultado = await atenderPerguntaLivre({
       sessionId,
@@ -742,12 +895,20 @@ export async function enviarMensagem(req: Request, res: Response) {
       ? resultado.resposta
       : "Não encontrei uma orientação suficientemente relacionada à sua dúvida. Você gostaria de solicitar um atendimento presencial no PROCON? Responda sim ou não.";
 
-    await salvarMensagem(sessaoId, "BOT", resposta, proximaEtapa);
+    await salvarMensagem(
+      sessaoId,
+      "BOT",
+      resposta,
+      proximaEtapa,
+    );
 
     await pool.query(
       `UPDATE sessoes
-       SET categoria = NULL, pergunta_atual = $2,
-           finalizada = FALSE, status = 'ativa', fim_sessao = NULL,
+       SET categoria = NULL,
+           pergunta_atual = $2,
+           finalizada = FALSE,
+           status = 'ativa',
+           fim_sessao = NULL,
            atualizado_em = CURRENT_TIMESTAMP
        WHERE id = $1`,
       [sessaoId, proximaEtapa],
@@ -756,7 +917,9 @@ export async function enviarMensagem(req: Request, res: Response) {
     return res.status(200).json({
       sessionId,
       resposta,
-      tipo: respostaEncontrada ? (resultado.tipo ?? "atendimento") : "oferecendo_agendamento",
+      tipo: respostaEncontrada
+        ? (resultado.tipo ?? "atendimento")
+        : "oferecendo_agendamento",
       opcoes: {},
       categoria: null,
       perguntaAtual: proximaEtapa,
@@ -788,26 +951,40 @@ export async function enviarMensagem(req: Request, res: Response) {
   }
 }
 
-export async function obterHistorico(req: Request, res: Response) {
+// ======================================================
+// OBTER HISTÓRICO DA CONVERSA
+// ======================================================
+
+export async function obterHistorico(
+  req: Request,
+  res: Response,
+) {
   try {
     const sessionId = req.params.sessionId;
 
     if (!sessionId) {
-      return res.status(400).json({ erro: "Informe o ID da sessão." });
+      return res.status(400).json({
+        erro: "Informe o ID da sessão.",
+      });
     }
 
     const sessao = await pool.query(
-      "SELECT id FROM sessoes WHERE session_id = $1",
+      `SELECT id
+       FROM sessoes
+       WHERE session_id = $1`,
       [sessionId],
     );
 
     if (!sessao.rows.length) {
-      return res.status(404).json({ erro: "Sessão não encontrada." });
+      return res.status(404).json({
+        erro: "Sessão não encontrada.",
+      });
     }
 
     const resultado = await pool.query(
       `SELECT id, tipo, mensagem, etapa, enviada_em
-       FROM mensagens WHERE sessao_id = $1
+       FROM mensagens
+       WHERE sessao_id = $1
        ORDER BY enviada_em ASC, id ASC`,
       [sessao.rows[0].id],
     );
@@ -815,11 +992,21 @@ export async function obterHistorico(req: Request, res: Response) {
     return res.status(200).json(resultado.rows);
   } catch (error) {
     console.error("Erro ao recuperar histórico:", error);
-    return res.status(500).json({ erro: "Não foi possível recuperar o histórico." });
+
+    return res.status(500).json({
+      erro: "Não foi possível recuperar o histórico.",
+    });
   }
 }
 
-export async function listarConversas(_req: Request, res: Response) {
+// ======================================================
+// LISTAR CONVERSAS
+// ======================================================
+
+export async function listarConversas(
+  _req: Request,
+  res: Response,
+) {
   try {
     const resultado = await pool.query(`
       SELECT
@@ -829,9 +1016,13 @@ export async function listarConversas(_req: Request, res: Response) {
         COALESCE(ultima.mensagem, '') AS "lastMessage",
         ultima.enviada_em AS "lastMessageAt"
       FROM sessoes s
-      LEFT JOIN usuarios u ON u.id = s.usuario_id
+      LEFT JOIN usuarios u
+        ON u.id = s.usuario_id
       LEFT JOIN LATERAL (
-        SELECT m.mensagem, m.enviada_em, m.id
+        SELECT
+          m.mensagem,
+          m.enviada_em,
+          m.id
         FROM mensagens m
         WHERE m.sessao_id = s.id
         ORDER BY m.enviada_em DESC, m.id DESC
@@ -843,6 +1034,9 @@ export async function listarConversas(_req: Request, res: Response) {
     return res.status(200).json(resultado.rows);
   } catch (error) {
     console.error("Erro ao listar conversas:", error);
-    return res.status(500).json({ erro: "Não foi possível listar as conversas." });
+
+    return res.status(500).json({
+      erro: "Não foi possível listar as conversas.",
+    });
   }
 }
