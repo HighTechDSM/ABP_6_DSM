@@ -9,13 +9,27 @@ const normalizarCpf = (valor: unknown) =>
 const normalizarTelefone = (valor: unknown) =>
   String(valor ?? "").replace(/\D/g, "");
 
-const dataValida = (valor: unknown): valor is string =>
-  typeof valor === "string" &&
-  /^\d{4}-\d{2}-\d{2}$/.test(valor) &&
-  !Number.isNaN(Date.parse(`${valor}T12:00:00`));
+const dataValida = (valor: unknown): valor is string => {
+  if (
+    typeof valor !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(valor)
+  ) {
+    return false;
+  }
 
-const horarioValido = (valor: unknown): valor is string =>
-  typeof valor === "string" && /^\d{2}:\d{2}$/.test(valor);
+  const [ano, mes, dia] = valor.split("-").map(Number);
+  const data = new Date(Date.UTC(ano, mes - 1, dia));
+
+  return (
+    data.getUTCFullYear() === ano &&
+    data.getUTCMonth() === mes - 1 &&
+    data.getUTCDate() === dia
+  );
+};
+
+const horarioValido = (valor: unknown) =>
+  typeof valor === "string" &&
+  /^([01]\d|2[0-3]):[0-5]\d$/.test(valor);
 
 function mensagemErro(error: unknown) {
   return error instanceof Error
@@ -58,20 +72,13 @@ export async function criarAgendamento(req: Request, res: Response) {
     });
   }
 
-  if (horario < "08:00" || horario > "15:15" ||
-      (horario >= "11:45" && horario < "12:00")) {
+  if (
+    horario < "08:00" ||
+    horario > "15:15" ||
+    (horario >= "11:45" && horario < "12:00")
+  ) {
     return res.status(400).json({
       erro: "O horário informado está fora do expediente de atendimento.",
-    });
-  }
-
-  const dataEscolhida = new Date(`${dataAgendamento}T12:00:00Z`);
-  const inicio = new Date("2026-10-26T00:00:00Z");
-  const fim = new Date("2026-10-30T23:59:59Z");
-
-  if (dataEscolhida < inicio || dataEscolhida > fim) {
-    return res.status(400).json({
-      erro: "Os agendamentos desta página devem ocorrer entre 26 e 30 de outubro de 2026.",
     });
   }
 
@@ -80,7 +87,6 @@ export async function criarAgendamento(req: Request, res: Response) {
   try {
     await client.query("BEGIN");
 
-    // Bloqueia alterações concorrentes dos mesmos dados durante a identificação.
     const buscaUsuario = await client.query(
       `SELECT id, nome, telefone, cpf
        FROM usuarios
@@ -110,7 +116,6 @@ export async function criarAgendamento(req: Request, res: Response) {
 
       usuarioId = Number(usuario.id);
 
-      // Atualiza o nome caso o funcionário tenha corrigido a informação.
       await client.query(
         `UPDATE usuarios SET nome = $1 WHERE id = $2`,
         [nome, usuarioId],
