@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Icon from './Icon'
 
 type SelectionMode = 'single' | 'range'
@@ -22,18 +22,33 @@ function toDateValue(date: Date) {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
+
   return `${year}-${month}-${day}`
 }
 
 function fromDateValue(value?: string) {
   if (!value) return null
+
   const [year, month, day] = value.split('-').map(Number)
+
   if (!year || !month || !day) return null
-  return new Date(year, month - 1, day)
+
+  const date = new Date(year, month - 1, day)
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null
+  }
+
+  return date
 }
 
 function formatFullDate(value?: string) {
   const date = fromDateValue(value)
+
   return date?.toLocaleDateString('pt-BR') ?? ''
 }
 
@@ -49,11 +64,32 @@ function MonthCalendar({
   onRangeChange,
   onUnavailableDate,
 }: MonthCalendarProps) {
-  const initialDate = fromDateValue(selectedDate || rangeStart) ?? new Date()
+  const initialDate =
+    fromDateValue(selectedDate || rangeStart) ?? new Date()
 
   const [visibleMonth, setVisibleMonth] = useState(
-    () => new Date(initialDate.getFullYear(), initialDate.getMonth(), 1),
+    () => new Date(
+      initialDate.getFullYear(),
+      initialDate.getMonth(),
+      1,
+    ),
   )
+
+  // Acompanha alterações externas na data selecionada.
+  useEffect(() => {
+    const referenceDate =
+      fromDateValue(selectedDate || rangeStart)
+
+    if (referenceDate) {
+      setVisibleMonth(
+        new Date(
+          referenceDate.getFullYear(),
+          referenceDate.getMonth(),
+          1,
+        ),
+      )
+    }
+  }, [selectedDate, rangeStart])
 
   const calendarDays = useMemo(() => {
     const firstDay = new Date(
@@ -63,11 +99,16 @@ function MonthCalendar({
     )
 
     const gridStart = new Date(firstDay)
-    gridStart.setDate(firstDay.getDate() - firstDay.getDay())
+
+    gridStart.setDate(
+      firstDay.getDate() - firstDay.getDay(),
+    )
 
     return Array.from({ length: 42 }, (_, index) => {
       const date = new Date(gridStart)
+
       date.setDate(gridStart.getDate() + index)
+
       return date
     })
   }, [visibleMonth])
@@ -80,9 +121,12 @@ function MonthCalendar({
   })
 
   function changeMonth(offset: number) {
-    setVisibleMonth(
-      (current) =>
-        new Date(current.getFullYear(), current.getMonth() + offset, 1),
+    setVisibleMonth((current) =>
+      new Date(
+        current.getFullYear(),
+        current.getMonth() + offset,
+        1,
+      ),
     )
   }
 
@@ -90,7 +134,11 @@ function MonthCalendar({
     const currentDate = new Date()
 
     setVisibleMonth(
-      new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+      new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        1,
+      ),
     )
   }
 
@@ -121,7 +169,10 @@ function MonthCalendar({
     >
       <div className="month-calendar__toolbar">
         <div>
-          <span className="month-calendar__label">Mês exibido</span>
+          <span className="month-calendar__label">
+            Mês exibido
+          </span>
+
           <strong>{monthLabel}</strong>
         </div>
 
@@ -179,13 +230,16 @@ function MonthCalendar({
           const isAvailable = availableDates.includes(value)
 
           const isSelected =
-            selectionMode === 'single' && value === selectedDate
+            selectionMode === 'single' &&
+            value === selectedDate
 
           const isRangeStart =
-            selectionMode === 'range' && value === rangeStart
+            selectionMode === 'range' &&
+            value === rangeStart
 
           const isRangeEnd =
-            selectionMode === 'range' && value === rangeEnd
+            selectionMode === 'range' &&
+            value === rangeEnd
 
           const isInRange =
             selectionMode === 'range' &&
@@ -207,7 +261,9 @@ function MonthCalendar({
             isSelected
               ? 'month-calendar__day--selected'
               : '',
-              isAvailable ? 'month-calendar__day--available' : '',
+            isAvailable
+              ? 'month-calendar__day--available'
+              : '',
             isRangeStart
               ? 'month-calendar__day--range-start'
               : '',
@@ -240,12 +296,12 @@ function MonthCalendar({
               className={classNames}
               key={value}
               onClick={() => {
-  if (isAvailable) {
-    selectDay(value)
-  } else {
-    onUnavailableDate?.()
-  }
-}}
+                if (isAvailable) {
+                  selectDay(value)
+                } else {
+                  onUnavailableDate?.()
+                }
+              }}
               role="gridcell"
               type="button"
             >
@@ -261,7 +317,10 @@ function MonthCalendar({
         })}
       </div>
 
-      <div className="month-calendar__footer" aria-live="polite">
+      <div
+        className="month-calendar__footer"
+        aria-live="polite"
+      >
         {selectionMode === 'single' &&
           (selectedDate ? (
             <>
@@ -296,4 +355,3 @@ function MonthCalendar({
 }
 
 export default MonthCalendar
-

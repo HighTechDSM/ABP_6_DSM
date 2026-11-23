@@ -4,18 +4,38 @@ import MonthCalendar from "../components/MonthCalendar";
 import PageHeader from "../components/PageHeader";
 import { backend, type Agendamento } from "../services/backend";
 
-const DIAS_DISPONIVEIS = [
-  "2026-11-17",
-  "2026-11-18",
-  "2026-11-19",
-  "2026-11-20",
-  "2026-11-23",
-  "2026-11-24",
-  "2026-11-25",
-  "2026-11-26",
-  "2026-11-27",
-  "2026-11-30",
-];
+// Gera os próximos 10 dias úteis, incluindo hoje se for dia útil.
+const gerarDiasDisponiveis = (quantidade: number): string[] => {
+  const dias: string[] = [];
+  const dataAtual = new Date();
+
+  const data = new Date(
+    dataAtual.getFullYear(),
+    dataAtual.getMonth(),
+    dataAtual.getDate(),
+  );
+
+  while (dias.length < quantidade) {
+    const diaSemana = data.getDay();
+
+    // 0 = domingo | 6 = sábado
+    if (diaSemana !== 0 && diaSemana !== 6) {
+      const ano = data.getFullYear();
+      const mes = String(data.getMonth() + 1).padStart(2, "0");
+      const dia = String(data.getDate()).padStart(2, "0");
+
+      dias.push(`${ano}-${mes}-${dia}`);
+    }
+
+    data.setDate(data.getDate() + 1);
+  }
+
+  return dias;
+};
+
+const DIAS_DISPONIVEIS = gerarDiasDisponiveis(10);
+
+
 
 const gerarHorarios = (inicio: number, fim: number) => {
   const horarios: string[] = [];
@@ -44,6 +64,10 @@ const formatarData = (date: string) => {
   const [ano, mes, dia] = date.split("-");
   return `${dia}/${mes}/${ano}`;
 };
+
+const periodoDisponivel = `${formatarData(DIAS_DISPONIVEIS[0])} a ${formatarData(
+  DIAS_DISPONIVEIS[DIAS_DISPONIVEIS.length - 1],
+)}`;
 
 const apenasNumeros = (valor: string) => valor.replace(/\D/g, "");
 
@@ -207,9 +231,8 @@ function Disponibilidade() {
           <button
             key={time}
             type="button"
-            className={`availability-time ${
-              ocupado ? "availability-time--selected" : ""
-            }`}
+            className={`availability-time ${ocupado ? "availability-time--selected" : ""
+              }`}
             disabled={!pessoaIdentificada || ocupado || salvando || carregando}
             title={
               ocupado
@@ -227,11 +250,6 @@ function Disponibilidade() {
       })}
     </div>
   );
-
-console.log("VERSÃO DO CALENDÁRIO:", {
-  diasDisponiveis: DIAS_DISPONIVEIS,
-  dataAtual: new Date().toISOString(),
-});
 
   return (
     <div className="page-stack">
@@ -309,7 +327,9 @@ console.log("VERSÃO DO CALENDÁRIO:", {
       <section className="panel">
         <div className="panel__heading">
           <div>
-            <span className="section-kicker">26 a 30 de outubro de 2026</span>
+            <span className="section-kicker">
+              {periodoDisponivel}
+            </span>
             <h2>Calendário de disponibilidade</h2>
           </div>
 
@@ -348,7 +368,9 @@ console.log("VERSÃO DO CALENDÁRIO:", {
               <h3 id="availability-modal-title">
                 Dia indisponível para atendimento
               </h3>
-              <p>Selecione uma data entre 26 e 30 de outubro de 2026.</p>
+              <p>
+                Selecione uma das datas disponíveis: {periodoDisponivel}.
+              </p>
               <button
                 type="button"
                 className="button button--primary availability-modal__button"
