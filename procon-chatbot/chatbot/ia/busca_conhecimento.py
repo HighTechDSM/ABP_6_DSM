@@ -76,9 +76,32 @@ def consultar_ollama(endpoint, payload, timeout=180):
         timeout=timeout
     )
 
-    resposta.raise_for_status()
+    if not resposta.ok:
+        logger.error(
+            'Erro Ollama HTTP %s: %s',
+            resposta.status_code,
+            resposta.text[:1000]
+        )
 
-    return resposta.json()
+        resposta.raise_for_status()
+
+    try:
+        dados = resposta.json()
+    except ValueError:
+        logger.error(
+            'O Ollama retornou conteúdo que não é JSON: %s',
+            resposta.text[:1000]
+        )
+        raise ValueError(
+            'Resposta inválida recebida do Ollama.'
+        )
+
+    if not isinstance(dados, dict):
+        raise ValueError(
+            'Formato inesperado na resposta do Ollama.'
+        )
+
+    return dados
 
 
 # =============================================================
