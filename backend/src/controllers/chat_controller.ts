@@ -668,26 +668,48 @@ export async function enviarMensagem(
           );
         }
 
-        // Não identifica usuários pelo nome.
-        // O telefone será utilizado para localizar o cadastro.
+        // Procura um usuário já cadastrado pelo nome.
+        const existente = await pool.query(
+          `SELECT id
+     FROM usuarios
+     WHERE LOWER(TRIM(nome)) = LOWER(TRIM($1))
+     LIMIT 2`,
+          [texto],
+        );
+
+        // Encontrou exatamente um usuário.
+        if (existente.rows.length === 1) {
+          return prosseguirComDadosExistentes(
+            res,
+            sessaoId,
+            sessionId,
+            Number(existente.rows[0].id),
+          );
+        }
+
+        // Não encontrou ou encontrou nomes duplicados.
         await pool.query(
           `UPDATE sessoes
-           SET cadastro_nome = $2,
-               pergunta_atual = 'aguardando_telefone',
-               atualizado_em = CURRENT_TIMESTAMP
-           WHERE id = $1`,
+     SET cadastro_nome = $2,
+         pergunta_atual = 'aguardando_telefone',
+         atualizado_em = CURRENT_TIMESTAMP
+     WHERE id = $1`,
           [sessaoId, texto],
         );
+
+        const resposta =
+          existente.rows.length > 1
+            ? "Encontrei mais de um cadastro com esse nome. Para identificar você corretamente, informe seu telefone com DDD."
+            : "Não encontrei seu cadastro pelo nome. Agora informe seu telefone com DDD.";
 
         return responderCadastro(
           res,
           sessaoId,
           etapaCadastro,
-          "Obrigado! Agora informe seu telefone com DDD.",
+          resposta,
           "aguardando_telefone",
         );
       }
-
       // ----------------------------------------------
       // ETAPA 2: TELEFONE
       // ----------------------------------------------
