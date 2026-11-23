@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -553,6 +552,28 @@ Se nenhuma FAQ for adequada:
                 'O modelo não retornou uma decisão de relevância.'
             )
 
+        
+        # Remove possíveis marcadores Markdown do JSON.
+
+        conteudo = conteudo.strip()
+
+        if conteudo.startswith('```'):
+
+            conteudo = re.sub(
+                r'^```(?:json)?\s*',
+                '',
+                conteudo,
+                flags=re.IGNORECASE
+            )
+
+            conteudo = re.sub(
+                r'\s*```$',
+                '',
+                conteudo
+            )
+
+        conteudo = conteudo.strip()
+
         # Interpreta o JSON retornado pelo modelo.
 
         try:
@@ -604,6 +625,7 @@ Se nenhuma FAQ for adequada:
         )
 
         return id_escolhido
+
 
     # ---------------------------------------------------------
     # GERAÇÃO DE RESPOSTA PELA IA
