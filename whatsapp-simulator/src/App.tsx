@@ -97,11 +97,28 @@ function Avatar({ conversation, small = false }: { conversation: Conversation; s
   </div>
 }
 
-const AVAILABLE_DATES = [
-  '2026-11-17', '2026-11-18', '2026-11-19', '2026-11-20',
-  '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26',
-  '2026-11-27', '2026-11-30',
-]
+function getAvailableDates(referenceDate = new Date()): string[] {
+  const dates: string[] = []
+
+  const date = new Date(
+    referenceDate.getFullYear(),
+    referenceDate.getMonth(),
+    referenceDate.getDate(),
+  )
+
+  while (dates.length < 10) {
+    const dayOfWeek = date.getDay()
+
+    // Segunda a sexta-feira.
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      dates.push(dateKey(date))
+    }
+
+    date.setDate(date.getDate() + 1)
+  }
+
+  return dates
+}
 
 const ACTIVE_APPOINTMENT_STATUSES = new Set(['agendado', 'confirmado'])
 
@@ -147,7 +164,12 @@ function ScheduleCard({
   onConfirm: () => void
   onCancel: () => void
 }) {
-  const [visibleMonth, setVisibleMonth] = useState(() => new Date(2026, 10, 1))
+  const [visibleMonth, setVisibleMonth] = useState(() => {
+    const today = new Date()
+    return new Date(today.getFullYear(), today.getMonth(), 1)
+  })
+
+  const availableDates = useMemo(() => getAvailableDates(), [])
   const [calendarNotice, setCalendarNotice] = useState('')
   const calendarDays = useMemo(() => {
     const firstDay = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1)
@@ -179,7 +201,7 @@ function ScheduleCard({
         {calendarDays.map((date) => {
           const value = dateKey(date)
           const outsideMonth = date.getMonth() !== visibleMonth.getMonth()
-          const available = AVAILABLE_DATES.includes(value)
+          const available = availableDates.includes(value)
           const selected = value === selectedDate
           const className = [
             'month-calendar__day',
